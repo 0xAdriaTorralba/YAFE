@@ -57,6 +57,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Aspect: 1.3333334
+    - _AspectX: 0.5098386
+    - _AspectY: 0.5098386
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
@@ -77,5 +79,5 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Pan: {r: 1.7693813, g: 0.0042368406, b: 0, a: 0}
-    - _Zoom: {r: 4.9999924, g: 3.7499943, b: 0, a: 0}
+    - _Pan: {r: -0.25763005, g: 0.07370201, b: 0, a: 0}
+    - _Zoom: {r: 1.9999981, g: 1.9999981, b: 0, a: 0}

@@ -3,8 +3,8 @@
     Properties
     {
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _Zoom("Zoom", Vector) =  (1, 1, 1, 1)
-        _Pan ("Pan", Vector) = (1, 1, 1, 1)
+        //_Zoom("Zoom", Vector) =  (1, 1, 1, 1)
+        //_Pan ("Pan", Vector) = (1, 1, 1, 1)
         _Aspect("Aspect Ratio", Float) = 1
         _Iterations ("Iterations", Range(1, 200000)) = 200
     }
@@ -28,8 +28,8 @@
         };
 
 
-        float4 _Zoom;
-        float4 _Pan;
+        //float4 _Zoom;
+        //float4 _Pan;
         int _Iterations;
         float _Aspect;
 
@@ -45,7 +45,9 @@
             // Albedo comes from a texture tinted by color
             //fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
 
-            float2 c = (IN.uv_MainTex - 0.5) * _Zoom.xy * float2(1, _Aspect) - _Pan.xy;
+            //float2 c = (IN.uv_MainTex - 0.5) * _Zoom.xy * float2(1, _Aspect) - _Pan.xy;
+            //float2 c = (IN.uv_MainTex - 0.5) * 4.0f * float2(1, _Aspect) -float2(0.5f, 0.0f);//- _Pan.xy;
+            float2 c = (IN.uv_MainTex - 0.5) * 4.0f * float2(1, _Aspect) -float2(0.5f, 0.0f);
             float2 v = 0;
             float m = 0;
             const float r = 5;

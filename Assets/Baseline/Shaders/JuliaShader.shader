@@ -4,8 +4,6 @@
     {
         _Seed("Seed", Vector) = (0.5, 0.5, 0.5, 0.5)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _Zoom("Zoom", Vector) =  (1, 1, 1, 1)
-        _Pan ("Pan", Vector) = (1, 1, 1, 1)
         _Aspect("Aspect Ratio", Float) = 1
         _Iterations ("Iterations", Range(1, 2000)) = 20
     }
@@ -28,9 +26,6 @@
             float2 uv_MainTex;
         };
 
-
-        float4 _Zoom;
-        float4 _Pan;
         int _Iterations;
         float _Aspect;
         float4 _Seed;
@@ -49,7 +44,7 @@
 
 
             float2 c = _Seed;
-            float2 v = (IN.uv_MainTex - 0.5) * _Zoom.xy * float2(1, _Aspect) - _Pan.xy;
+            float2 v = (IN.uv_MainTex - 0.5) * 4.0f * float2(1, _Aspect);
             float m = 0;
             const float r = 5;
 
