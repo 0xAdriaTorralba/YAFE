@@ -6,7 +6,7 @@
         _Zoom("Zoom", Vector) =  (1, 1, 1, 1)
         _Pan ("Pan", Vector) = (1, 1, 1, 1)
         _Aspect("Aspect Ratio", Float) = 1
-        _Iterations ("Iterations", Range(1, 200000)) = 20
+        _Iterations ("Iterations", Range(1, 200000)) = 200
     }
     SubShader
     {
@@ -51,12 +51,16 @@
             const float r = 5;
 
             for (int n = 0; n < _Iterations; ++n){
+                // z_n = z_(n-1)^2 + c;
                 v = float2(v.x * v.x - v.y * v.y, v.x * v.y * 2) + c;
 
                 if (dot(v, v) < (r*r - 1)){
                     m++;
                 }
                 v = clamp(v, -r, r);
+                if (length(v) > 2){
+                    break;
+                }
             }
 
             float4 color;
