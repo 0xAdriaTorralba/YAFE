@@ -23,9 +23,12 @@ public class CPUFractalController : MonoBehaviour
     private bool finished;
     private Coroutine drawingThread;
     double viewPortX, viewPortY;
+
+    private LogsController logsController;
     void Awake()
     {   
         finished = false;
+        logsController = GameObject.FindGameObjectWithTag("LogsController").GetComponent<LogsController>();
         //results = new Color[pwidth, pheight];
         //resultArray = new NativeArray<Color>(pwidth * pheight, Allocator.Persistent);
         double ratio = pwidth / pheight;
@@ -44,7 +47,9 @@ public class CPUFractalController : MonoBehaviour
     }
 
     void Start(){
-        drawingThread = StartCoroutine(ChangeTheColor());
+        drawingThread = null;
+        //StartDraw();
+        //drawingThread = StartCoroutine(ChangeTheColor());
         finished = true;
     }
 
@@ -59,7 +64,7 @@ public class CPUFractalController : MonoBehaviour
     public void StopDrawingCorroutine(){
         try{
             StopCoroutine(drawingThread);
-            Debug.Log("Mandelbrot drawing corroutine finished successfully.");
+            logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine stopped."});
             count = 0;
             brush = new Texture2D((int)pwidth, (int)pheight);
         }catch {}
@@ -167,6 +172,8 @@ public class CPUFractalController : MonoBehaviour
 
     IEnumerator ChangeTheColor(){
         yield return null;
+        logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine started."});
+
         int i;
         int x, y;
         finished = false;
@@ -210,6 +217,8 @@ public class CPUFractalController : MonoBehaviour
         brush.Apply();
         yield return new WaitForSeconds(0.5f);
         finished = true;
+
+        logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully."});
         
     }
         
@@ -217,6 +226,6 @@ public class CPUFractalController : MonoBehaviour
     {
         //GUILayout.Label(brush);
         //GUI.DrawTexture(new Rect(Input.mousePosition.x, Screen.height - Input.mousePosition.y, pwidth, pheight), brush);
-        GUI.DrawTexture(new Rect(Screen.width - positionX, Screen.height-positionY, pwidth, pheight), brush);
+        GUI.DrawTexture(new Rect(Screen.width - positionX, Screen.height - positionY, pwidth, pheight), brush);
     }
 }

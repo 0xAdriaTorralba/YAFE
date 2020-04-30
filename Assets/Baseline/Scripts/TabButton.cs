@@ -4,18 +4,18 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
+//[RequireComponent(typeof(Image))]
 public class TabButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
 {
 
     public TabGroup tabGroup;
 
-    public Image background;
+    //public Image background;
 
 
     void Start()
     {
-        background = GetComponent<Image>();
+        //background = GetComponent<Image>();
         tabGroup.Suscribe(this);
     }
 

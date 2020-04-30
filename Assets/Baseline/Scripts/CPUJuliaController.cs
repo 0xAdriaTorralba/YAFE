@@ -27,9 +27,11 @@ public class CPUJuliaController : MonoBehaviour
     private Coroutine drawingThread;
 
     private double rez, imz;
+    private LogsController logsController;
     void Awake()
     {   
         finished = true;
+        logsController = GameObject.FindGameObjectWithTag("LogsController").GetComponent<LogsController>();
         //results = new Color[pwidth, pheight];
         //resultArray = new NativeArray<Color>(pwidth * pheight, Allocator.Persistent);
         double ratio = pwidth / pheight;
@@ -52,9 +54,9 @@ public class CPUJuliaController : MonoBehaviour
     }
 
     public void StartDraw(double rez, double imz){
-        if (!finished){
+        try{
             StopCoroutine(drawingThread);
-        }
+        }catch {} 
         finished = false;
         this.rez = rez;
         this.imz = imz;
@@ -72,7 +74,7 @@ public class CPUJuliaController : MonoBehaviour
     public void StopDrawingCorroutine(){
         try{
             StopCoroutine(drawingThread);
-            Debug.Log("Julia drawing corroutine finished successfully.");
+            logsController.UpdateLogs(new string[] {"Julia drawing corroutine stopped."});
             count = 0;
             brush = new Texture2D((int)pwidth, (int)pheight);
         }catch {}
@@ -172,6 +174,8 @@ public class CPUJuliaController : MonoBehaviour
     }*/
 
     IEnumerator ChangeTheColor(double rez, double imz){
+        logsController.UpdateLogs(new string[] {"Julia drawing corroutine started."});
+
         yield return null;
         int i;
         int x, y;
@@ -215,6 +219,9 @@ public class CPUJuliaController : MonoBehaviour
         }
         brush.Apply();
         finished = true;
+
+        logsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully."});
+
         
     }
         

@@ -49,7 +49,7 @@ public class ProgressBarController : MonoBehaviour
     IEnumerator UpdateProgressBarMandelbrot(CPUFractalController fractalController){
         while(!fractalController.GetFinished()){
             progressBar.fillAmount = (float)fractalController.GetProgress();
-            percentage.text = fractalController.GetProgress() * 100 + " %";
+            percentage.text = (int)(fractalController.GetProgress() * 100)+ "";
             yield return null;
         }
     }
@@ -57,7 +57,7 @@ public class ProgressBarController : MonoBehaviour
     IEnumerator UpdateProgressBarJulia(CPUJuliaController fractalController){
         while(!fractalController.GetFinished()){
             progressBar.fillAmount = (float)fractalController.GetProgress();
-            percentage.text = fractalController.GetProgress() * 100 + " %";
+            percentage.text = (int)(fractalController.GetProgress() * 100)+ "";
             yield return null;
         }
     }

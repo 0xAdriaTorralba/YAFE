@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class InterfaceController : MonoBehaviour
 {
@@ -21,9 +22,14 @@ public class InterfaceController : MonoBehaviour
 
     private double rez, imz;
 
+    private GameObject dialogBox;
+
     private double defaultZoom, defaultMovement;
     void Awake()
     {
+        dialogBox = GameObject.FindGameObjectWithTag("DialogBox");
+        dialogBox.SetActive(false);
+
         GameObject complexNumber = GameObject.Find("Complex Number Mandelbrot/Real Part");
         realPart = complexNumber.GetComponent<Text>();
         realPartJulia = GameObject.Find("Complex Number Julia/Real Part").GetComponent<Text>();
@@ -78,6 +84,8 @@ public class InterfaceController : MonoBehaviour
         leftJulia.onClick.AddListener(() => LeftJulia(defaultMovement));
         rightJulia.onClick.AddListener(() => RightJulia(defaultMovement));
         refreshJulia.onClick.AddListener(() => RefreshFractalJulia());
+        
+        
         
         StartCoroutine(ListenerFractal());
 
@@ -207,11 +215,15 @@ public class InterfaceController : MonoBehaviour
     void Update()
     {
         if(Input.GetMouseButtonDown(0)){
-            if ((int) Input.mousePosition.x - 120 >= 0 && (int) Input.mousePosition.x - 120 <= 700
-                && (int)Input.mousePosition.y - 180 >= 0 && (int) Input.mousePosition.y - 180 <= 700){
+            if (   (int) Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX) >= 0 
+                && (int) Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX) <= fractalMandelbrot.pwidth
+                && (int) Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) >= 0 
+                && (int) Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) <= fractalMandelbrot.pheight){
                     fractalJulia.StartDraw(rez, imz);
-                    realPartJulia.text = "Re(z) = " + rez;
-                    imaginaryPartJulia.text = "Im(z) = " + imz;
+                    //realPartJulia.text = "z = " + rez;
+                    //imaginaryPartJulia.text = "+ i " + imz;
+                    if (imz < 0) realPartJulia.text = "c = "+ rez + " - i "+ Math.Abs(imz);
+                    else realPartJulia.text = "c = "+ rez + " + i "+ imz;
                     progressBarControllerJulia.StartProgressBarJulia();
                 }
         }
@@ -219,12 +231,18 @@ public class InterfaceController : MonoBehaviour
 
     IEnumerator ListenerFractal(){
         while (true){
-            if ((int) Input.mousePosition.x - 120 >= 0 && (int) Input.mousePosition.x - 120 <= 700
-                && (int)Input.mousePosition.y - 180 >= 0 && (int) Input.mousePosition.y - 180 <= 700){
-                    rez = fractalMandelbrot.GetViewPortX((int)Input.mousePosition.x - 120);
-                    imz = fractalMandelbrot.GetViewPortY((int)Input.mousePosition.y - 180);
-                    realPart.text = "Re(z) = "+ rez;
-                    imaginaryPart.text = "Im(z) = "+ imz;
+            if (   ((int) Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX) >= 0) 
+                && ((int) Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX) <= fractalMandelbrot.pwidth)
+                && ((int) Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) >= 0) 
+                && ((int) Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) <= fractalMandelbrot.pheight)){
+                    rez = fractalMandelbrot.GetViewPortX((int)Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX));
+                    imz = fractalMandelbrot.GetViewPortY((int)Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY));
+                    Debug.Log(Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) + " "+ imz);
+                    //realPart.text = "z = "+ rez;
+                    //imaginaryPart.text = "+ i "+ imz;
+                    if (imz < 0) realPart.text = "z = "+ rez + " - i "+ Math.Abs(imz);
+                    else realPart.text = "z = "+ rez + " + i "+ imz;
+                    
             }
             yield return new WaitForEndOfFrame();
         }
@@ -243,5 +261,9 @@ public class InterfaceController : MonoBehaviour
     public void RestartDrawingCoroutines(){
         StopAllDrawingCoroutines();
         StartDrawing();
+    }
+
+    public void ToggleAboutDialog(){
+        dialogBox.SetActive(!dialogBox.activeInHierarchy);
     }
 }

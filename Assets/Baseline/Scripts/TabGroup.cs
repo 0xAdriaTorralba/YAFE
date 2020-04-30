@@ -6,6 +6,10 @@ using UnityEngine.UI;
 public class TabGroup : MonoBehaviour
 {
 
+    private Color selectedColor = new Color(0f, 0.5647059f, 0.6196079f);
+    private Color hoverColor = new Color(0.1529412f, 0.2862745f, 0.427451f);
+    private Color idleColor =  new Color(0.1076451f, 0.2006943f, 0.3867925f);
+
     public List<TabButton> tabButtons;
 
     public Sprite tabIdle, tabHover, tabActive;
@@ -19,6 +23,7 @@ public class TabGroup : MonoBehaviour
 
     void Awake(){
         interfaceController = GameObject.FindGameObjectWithTag("InterfaceController").GetComponent<InterfaceController>();
+
         
     }
 
@@ -37,20 +42,23 @@ public class TabGroup : MonoBehaviour
     public void OnTabEnter(TabButton button){
         ResetTabs();
         if (selectedTab == null || button != selectedTab){
-            button.background.sprite = tabHover;
+            button.GetComponent<Image>().color = hoverColor;
         }
         
     }
 
     public void OnTabExit(TabButton button){
         ResetTabs();
-        button.background.sprite = tabIdle;
+        if (button != selectedTab || selectedTab == null){
+            button.GetComponent<Image>().color = idleColor;
+        }
     }
 
     public void OnTabSelected(TabButton button){
         if (selectedTab != null && button == selectedTab){
             selectedTab = null;
             ResetPages();
+            button.GetComponent<Image>().color = hoverColor;
             objectsToSwap[2].SetActive(true);
             return;
         }
@@ -59,7 +67,7 @@ public class TabGroup : MonoBehaviour
         selectedTab = button;
         ResetTabs();
         ResetPages();
-        button.background.sprite = tabActive;
+        button.GetComponent<Image>().color = selectedColor;
         int index = button.transform.GetSiblingIndex();
         for (int i = 0; i < objectsToSwap.Count; i++){
             if (i == index){
@@ -88,7 +96,7 @@ public class TabGroup : MonoBehaviour
             if (selectedTab != null && selectedTab == button){ 
                 continue; 
             }
-            button.background.sprite = tabIdle;
+            button.GetComponent<Image>().color = idleColor;
         }
 
         
