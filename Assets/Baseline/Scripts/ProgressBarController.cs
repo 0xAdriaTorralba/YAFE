@@ -15,6 +15,8 @@ public class ProgressBarController : MonoBehaviour
     public string attatch;
 
     private Text percentage;
+
+    private Coroutine pbMandelbrot = null, pbJulia = null;
     void Start()
     {
         fractalRenderer = GameObject.FindGameObjectWithTag(attatch);
@@ -22,28 +24,29 @@ public class ProgressBarController : MonoBehaviour
         percentage = this.transform.Find("Percentage").GetComponent<Text>();
         if (attatch.Equals("Mandelbrot")){ 
             fractalMandelbrot = fractalRenderer.GetComponent<CPUFractalController>();
-            StartCoroutine(UpdateProgressBarMandelbrot(fractalMandelbrot));
+            pbMandelbrot = StartCoroutine(UpdateProgressBarMandelbrot(fractalMandelbrot));
         }else{
             fractalJulia = fractalRenderer.GetComponent<CPUJuliaController>();
-            StartCoroutine(UpdateProgressBarJulia(fractalJulia));
+            pbJulia = StartCoroutine(UpdateProgressBarJulia(fractalJulia));
         } 
         
-        
-        //StartCoroutine(UpdateProgressBarMandelbrot(fractalController));
+    }
+
+    void Update(){
+        if (!fractalMandelbrot.GetFinished() && pbMandelbrot != null){
+            StartProgressBarMandelbrot();
+        }
+        if (!fractalJulia.GetFinished() && pbJulia != null){
+            StartProgressBarJulia();
+        }
     }
 
     public void StartProgressBarMandelbrot(){
-        StartCoroutine(UpdateProgressBarMandelbrot(fractalMandelbrot));
+        pbMandelbrot =StartCoroutine(UpdateProgressBarMandelbrot(fractalMandelbrot));
     }
 
     public void StartProgressBarJulia(){
-        StartCoroutine(UpdateProgressBarJulia(fractalJulia));
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //progressBar.fillAmount = fractalController.GetProgress();
+        pbJulia = StartCoroutine(UpdateProgressBarJulia(fractalJulia));
     }
 
     IEnumerator UpdateProgressBarMandelbrot(CPUFractalController fractalController){

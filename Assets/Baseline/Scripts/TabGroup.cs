@@ -12,7 +12,7 @@ public class TabGroup : MonoBehaviour
 
     public List<TabButton> tabButtons;
 
-    public Sprite tabIdle, tabHover, tabActive;
+   // public Sprite tabIdle, tabHover, tabActive;
     
     public TabButton selectedTab;
 
@@ -29,7 +29,8 @@ public class TabGroup : MonoBehaviour
 
     void Start(){
         ResetPages();
-        objectsToSwap[2].SetActive(true);
+        objectsToSwap[objectsToSwap.Count-1].SetActive(true);
+
     }
     public void Suscribe (TabButton button){
         if (tabButtons == null){
@@ -59,10 +60,10 @@ public class TabGroup : MonoBehaviour
             selectedTab = null;
             ResetPages();
             button.GetComponent<Image>().color = hoverColor;
-            objectsToSwap[2].SetActive(true);
+            objectsToSwap[objectsToSwap.Count-1].SetActive(true);
             return;
         }
-        objectsToSwap[2].SetActive(false);
+        objectsToSwap[0].SetActive(false);
 
         selectedTab = button;
         ResetTabs();
@@ -72,7 +73,7 @@ public class TabGroup : MonoBehaviour
         for (int i = 0; i < objectsToSwap.Count; i++){
             if (i == index){
                 objectsToSwap[i].SetActive(true);
-                if (index == 0){
+                if (index == objectsToSwap.Count - 1){
                     interfaceController.RestartDrawingCoroutines();
                 }
             }else{

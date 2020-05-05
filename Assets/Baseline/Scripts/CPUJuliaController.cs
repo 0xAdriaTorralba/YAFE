@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using System.Numerics;
+using UnityEngine.UI;
 
 public class CPUJuliaController : MonoBehaviour
 {
@@ -28,10 +29,12 @@ public class CPUJuliaController : MonoBehaviour
 
     private double rez, imz;
     private LogsController logsController;
+    private Image juliaImage;
     void Awake()
     {   
         finished = true;
         logsController = GameObject.FindGameObjectWithTag("LogsController").GetComponent<LogsController>();
+        juliaImage = GameObject.FindGameObjectWithTag("Julia").GetComponent<Image>();
         //results = new Color[pwidth, pheight];
         //resultArray = new NativeArray<Color>(pwidth * pheight, Allocator.Persistent);
         double ratio = pwidth / pheight;
@@ -74,7 +77,7 @@ public class CPUJuliaController : MonoBehaviour
     public void StopDrawingCorroutine(){
         try{
             StopCoroutine(drawingThread);
-            logsController.UpdateLogs(new string[] {"Julia drawing corroutine stopped."});
+            logsController.UpdateLogs(new string[] {"Julia drawing corroutine stopped."}, "#ff0000ff");
             count = 0;
             brush = new Texture2D((int)pwidth, (int)pheight);
         }catch {}
@@ -174,7 +177,7 @@ public class CPUJuliaController : MonoBehaviour
     }*/
 
     IEnumerator ChangeTheColor(double rez, double imz){
-        logsController.UpdateLogs(new string[] {"Julia drawing corroutine started."});
+        logsController.UpdateLogs(new string[] {"Julia drawing corroutine started."}, "	#ffffffff");
 
         yield return null;
         int i;
@@ -215,12 +218,17 @@ public class CPUJuliaController : MonoBehaviour
                 //     yield return new WaitForEndOfFrame();
                 // }
             }
-            if (x % 10 == 0) brush.Apply(); yield return new WaitForEndOfFrame();
+            if (x % 10 == 0){ 
+                brush.Apply();
+                juliaImage.sprite = Sprite.Create(brush, new Rect(0, 0, brush.width, brush.height), new UnityEngine.Vector2(0.5f, 0.5f), 100f);
+                yield return new WaitForEndOfFrame();
+            }
         }
         brush.Apply();
+        juliaImage.sprite = Sprite.Create(brush, new Rect(0, 0, brush.width, brush.height), new UnityEngine.Vector2(0.5f, 0.5f), 100f);
         finished = true;
 
-        logsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully."});
+        logsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully."}, "#00ff00ff");
 
         
     }
@@ -229,6 +237,6 @@ public class CPUJuliaController : MonoBehaviour
     {
         //GUILayout.Label(brush);
         //GUI.DrawTexture(new Rect(Input.mousePosition.x, Screen.height - Input.mousePosition.y, pwidth, pheight), brush);
-        GUI.DrawTexture(new Rect(Screen.width - positionX, Screen.height-positionY, pwidth, pheight), brush);
+        //GUI.DrawTexture(new Rect(Screen.width - positionX, Screen.height-positionY, pwidth, pheight), brush);
     }
 }

@@ -37,7 +37,7 @@ public class EvaluationFunction : MonoBehaviour
         float maxY = displayParameters.dimY;
         float windowWidth = maxX - minX;
         float windowHeight = maxY - minY;
-        float viewPortX, viewPortY;
+        //float viewPortX, viewPortY;
 
         int maxIters = 255;
 

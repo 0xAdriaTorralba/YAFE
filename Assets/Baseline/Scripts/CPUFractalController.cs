@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using System.Numerics;
+using UnityEngine.UI;
 
 public class CPUFractalController : MonoBehaviour
 {
@@ -25,10 +26,12 @@ public class CPUFractalController : MonoBehaviour
     double viewPortX, viewPortY;
 
     private LogsController logsController;
+    private Image mandelbrotImage;
     void Awake()
     {   
         finished = false;
         logsController = GameObject.FindGameObjectWithTag("LogsController").GetComponent<LogsController>();
+        mandelbrotImage = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<Image>();
         //results = new Color[pwidth, pheight];
         //resultArray = new NativeArray<Color>(pwidth * pheight, Allocator.Persistent);
         double ratio = pwidth / pheight;
@@ -48,6 +51,7 @@ public class CPUFractalController : MonoBehaviour
 
     void Start(){
         drawingThread = null;
+        StartDraw();
         //StartDraw();
         //drawingThread = StartCoroutine(ChangeTheColor());
         finished = true;
@@ -59,12 +63,13 @@ public class CPUFractalController : MonoBehaviour
         }catch{}
         finished = false;
         drawingThread =  StartCoroutine(ChangeTheColor());
+        
     }
 
     public void StopDrawingCorroutine(){
         try{
             StopCoroutine(drawingThread);
-            logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine stopped."});
+            logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine stopped."}, "#ff0000ff");
             count = 0;
             brush = new Texture2D((int)pwidth, (int)pheight);
         }catch {}
@@ -172,7 +177,7 @@ public class CPUFractalController : MonoBehaviour
 
     IEnumerator ChangeTheColor(){
         yield return null;
-        logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine started."});
+        logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine started."}, "#ffffffff");
 
         int i;
         int x, y;
@@ -212,13 +217,18 @@ public class CPUFractalController : MonoBehaviour
                 //     yield return new WaitForEndOfFrame();
                 // }
             }
-            if (x % 10 == 0) brush.Apply(); yield return new WaitForEndOfFrame();
+            if (x % 10 == 0){ 
+                brush.Apply(); 
+                mandelbrotImage.sprite = Sprite.Create(brush, new Rect(0, 0, brush.width, brush.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
+                yield return new WaitForEndOfFrame();
+            }
         }
         brush.Apply();
+        mandelbrotImage.sprite = Sprite.Create(brush, new Rect(0, 0, brush.width, brush.height), new UnityEngine.Vector2(0.5f, 0.5f), 100f);
         yield return new WaitForSeconds(0.5f);
         finished = true;
 
-        logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully."});
+        logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully."}, "#00ff00ff");
         
     }
         
@@ -226,6 +236,6 @@ public class CPUFractalController : MonoBehaviour
     {
         //GUILayout.Label(brush);
         //GUI.DrawTexture(new Rect(Input.mousePosition.x, Screen.height - Input.mousePosition.y, pwidth, pheight), brush);
-        GUI.DrawTexture(new Rect(Screen.width - positionX, Screen.height - positionY, pwidth, pheight), brush);
+        //GUI.DrawTexture(new Rect(Screen.width - positionX, Screen.height - positionY, pwidth, pheight), brush);
     }
 }

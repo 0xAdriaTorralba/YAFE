@@ -237,7 +237,6 @@ public class InterfaceController : MonoBehaviour
                 && ((int) Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) <= fractalMandelbrot.pheight)){
                     rez = fractalMandelbrot.GetViewPortX((int)Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX));
                     imz = fractalMandelbrot.GetViewPortY((int)Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY));
-                    Debug.Log(Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) + " "+ imz);
                     //realPart.text = "z = "+ rez;
                     //imaginaryPart.text = "+ i "+ imz;
                     if (imz < 0) realPart.text = "z = "+ rez + " - i "+ Math.Abs(imz);

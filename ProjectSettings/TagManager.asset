@@ -13,6 +13,7 @@ TagManager:
   - DialogBox
   - LogsController
   - TextLogs
+  - MandelbrotImage
   layers:
   - Default
   - TransparentFX

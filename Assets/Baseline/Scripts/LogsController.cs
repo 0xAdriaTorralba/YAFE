@@ -27,11 +27,11 @@ public class LogsController : MonoBehaviour
         logsBar.SetActive(false);
     }
 
-    public void UpdateLogs(string[] newLogs){
-        StartCoroutine(DisplayNextLog(newLogs));
+    public void UpdateLogs(string[] newLogs, String color){
+        StartCoroutine(DisplayNextLog(newLogs, color));
     }
 
-    private IEnumerator DisplayNextLog(string[] newLogs){
+    private IEnumerator DisplayNextLog(string[] newLogs, String color){
         yield return new WaitForEndOfFrame();
 
         logs.Clear();
@@ -45,7 +45,7 @@ public class LogsController : MonoBehaviour
         ActivateLogs();
         DateTime date = DateTime.Now;
         string newLog = logs.Dequeue();
-        newLog = '<' + DateTime.Now.ToString("HH:mm:ss") + "> " + newLog;
+        newLog = "<color=" + color + ">" + '<' + DateTime.Now.ToString("HH:mm:ss") + "> " + newLog + "</color>";
         string[] currentLogs = textLogs.text.Split('\n', (char) StringSplitOptions.RemoveEmptyEntries);
         textLogs.text = currentLogs[1] + '\n' + currentLogs[2] + '\n' + currentLogs[3] + '\n' + currentLogs[4] + '\n' + newLog;
     }
