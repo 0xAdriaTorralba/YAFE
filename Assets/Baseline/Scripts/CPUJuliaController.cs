@@ -226,6 +226,7 @@ public class CPUJuliaController : MonoBehaviour
         }
         brush.Apply();
         juliaImage.sprite = Sprite.Create(brush, new Rect(0, 0, brush.width, brush.height), new UnityEngine.Vector2(0.5f, 0.5f), 100f);
+        yield return new WaitForSeconds(0.5f);
         finished = true;
 
         logsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully."}, "#00ff00ff");

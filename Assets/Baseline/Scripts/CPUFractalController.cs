@@ -83,11 +83,11 @@ public class CPUFractalController : MonoBehaviour
         return finished;
     }
 
-    public double GetViewPortX(int x){
+    public double GetViewPortX(double x){
         return xmin + ((double)x / pwidth) * viewPortWidth + panX;
     }
 
-    public double GetViewPortY(int y){
+    public double GetViewPortY(double y){
         return ymin + ((double)y / pheight) * viewPortHeight + panY;
     }
 

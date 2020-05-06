@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using UnityEngine.EventSystems;
 
 public class InterfaceController : MonoBehaviour
 {
@@ -14,7 +15,13 @@ public class InterfaceController : MonoBehaviour
     private CPUFractalController fractalMandelbrot;
     private CPUJuliaController fractalJulia;
     private ProgressBarController progressBarControllerMandelbrot, progressBarControllerJulia;
+
+    private CoordinatesListener coordinatesListener;
     private GameObject eventSystem;
+    
+    private float rayLength;
+
+    public LayerMask layerMask;
 
     private Button zoomInMandelbrot, zoomOutMandelbrot, refreshMandelbrot, upMandelbrot, downMandelbrot, leftMandelbrot, rightMandelbrot;
 
@@ -23,6 +30,7 @@ public class InterfaceController : MonoBehaviour
     private double rez, imz;
 
     private GameObject dialogBox;
+
 
     private double defaultZoom, defaultMovement;
     void Awake()
@@ -40,6 +48,7 @@ public class InterfaceController : MonoBehaviour
         fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<CPUJuliaController>();
         progressBarControllerJulia = GameObject.Find("Progress Bar Julia").GetComponent<ProgressBarController>();
         progressBarControllerMandelbrot = GameObject.Find("Progress Bar Mandelbrot").GetComponent<ProgressBarController>();
+        coordinatesListener = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<CoordinatesListener>();
         eventSystem = GameObject.FindGameObjectWithTag("EventSystem");
 
         // Buttons setup
@@ -215,36 +224,25 @@ public class InterfaceController : MonoBehaviour
     void Update()
     {
         if(Input.GetMouseButtonDown(0)){
-            if (   (int) Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX) >= 0 
-                && (int) Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX) <= fractalMandelbrot.pwidth
-                && (int) Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) >= 0 
-                && (int) Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) <= fractalMandelbrot.pheight){
-                    fractalJulia.StartDraw(rez, imz);
-                    //realPartJulia.text = "z = " + rez;
-                    //imaginaryPartJulia.text = "+ i " + imz;
-                    if (imz < 0) realPartJulia.text = "c = "+ rez + " - i "+ Math.Abs(imz);
-                    else realPartJulia.text = "c = "+ rez + " + i "+ imz;
-                    progressBarControllerJulia.StartProgressBarJulia();
-                }
+            fractalJulia.StartDraw(rez, imz);
+            //realPartJulia.text = "z = " + rez;
+            //imaginaryPartJulia.text = "+ i " + imz;
+            if (imz < 0) realPartJulia.text = "c = "+ rez + " - i "+ Math.Abs(imz);
+            else realPartJulia.text = "c = "+ rez + " + i "+ imz;
+            progressBarControllerJulia.StartProgressBarJulia();
         }
+        
     }
 
     IEnumerator ListenerFractal(){
         while (true){
-            if (   ((int) Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX) >= 0) 
-                && ((int) Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX) <= fractalMandelbrot.pwidth)
-                && ((int) Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) >= 0) 
-                && ((int) Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY) <= fractalMandelbrot.pheight)){
-                    rez = fractalMandelbrot.GetViewPortX((int)Input.mousePosition.x - (Screen.width - fractalMandelbrot.positionX));
-                    imz = fractalMandelbrot.GetViewPortY((int)Input.mousePosition.y - 25 - (Screen.height - fractalMandelbrot.positionY));
-                    //realPart.text = "z = "+ rez;
-                    //imaginaryPart.text = "+ i "+ imz;
-                    if (imz < 0) realPart.text = "z = "+ rez + " - i "+ Math.Abs(imz);
-                    else realPart.text = "z = "+ rez + " + i "+ imz;
-                    
-            }
-            yield return new WaitForEndOfFrame();
+            rez = fractalMandelbrot.GetViewPortX(coordinatesListener.getX());
+            imz = fractalMandelbrot.GetViewPortY(coordinatesListener.getY());
+            if (imz < 0) realPart.text = "z = "+ rez + " - i "+ Math.Abs(imz);
+            else realPart.text = "z = "+ rez + " + i "+ imz;
+            yield return null;
         }
+        yield return new WaitForEndOfFrame();
     }
 
     public void StopAllDrawingCoroutines(){

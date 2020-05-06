@@ -33,16 +33,20 @@ public class ProgressBarController : MonoBehaviour
     }
 
     void Update(){
-        if (!fractalMandelbrot.GetFinished() && pbMandelbrot != null){
-            StartProgressBarMandelbrot();
+        if (attatch.Equals("Mandelbrot")){
+            if (!fractalMandelbrot.GetFinished() && pbMandelbrot != null){
+                StartProgressBarMandelbrot();
+            }
         }
-        if (!fractalJulia.GetFinished() && pbJulia != null){
-            StartProgressBarJulia();
+        if (attatch.Equals("Julia")){
+            if (!fractalJulia.GetFinished() && pbJulia != null){
+                StartProgressBarJulia();
+            }
         }
     }
 
     public void StartProgressBarMandelbrot(){
-        pbMandelbrot =StartCoroutine(UpdateProgressBarMandelbrot(fractalMandelbrot));
+        pbMandelbrot = StartCoroutine(UpdateProgressBarMandelbrot(fractalMandelbrot));
     }
 
     public void StartProgressBarJulia(){
