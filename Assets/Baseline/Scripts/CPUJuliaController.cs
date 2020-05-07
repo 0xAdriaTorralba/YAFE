@@ -29,11 +29,14 @@ public class CPUJuliaController : MonoBehaviour
 
     private double rez, imz;
     private LogsController logsController;
+
+    private ProgressBarController progressBar;
     private Image juliaImage;
     void Awake()
     {   
-        finished = true;
+        finished = false;
         logsController = GameObject.FindGameObjectWithTag("LogsController").GetComponent<LogsController>();
+        progressBar = GameObject.Find("Utilities Julia/Progress Bar Julia").GetComponent<ProgressBarController>();
         juliaImage = GameObject.FindGameObjectWithTag("Julia").GetComponent<Image>();
         //results = new Color[pwidth, pheight];
         //resultArray = new NativeArray<Color>(pwidth * pheight, Allocator.Persistent);
@@ -49,11 +52,20 @@ public class CPUJuliaController : MonoBehaviour
         //StartCoroutine(ChangeTheColor());
         //ChangeTheColor();
         //ChangeTheColorParallel();
+        //StartDraw(0.0, 0.0);
     }
 
     public void Start(){
+        //drawingThread = StartCoroutine(StartDraw(0.0, 0.0));
         drawingThread = null;
+        StartDraw(0.0, 0.0);
+        RedrawCurrent();
         finished = true;
+    }
+
+    void OnEnable()
+    {
+        StartDraw(0.0, 0.0);
     }
 
     public void StartDraw(double rez, double imz){
@@ -63,7 +75,8 @@ public class CPUJuliaController : MonoBehaviour
         finished = false;
         this.rez = rez;
         this.imz = imz;
-        drawingThread =  StartCoroutine(ChangeTheColor(rez, imz));
+        drawingThread = StartCoroutine(ChangeTheColor(rez, imz));
+        progressBar.StartProgressBarJulia();
     }
 
     public void RedrawCurrent(){
@@ -72,6 +85,8 @@ public class CPUJuliaController : MonoBehaviour
         }
         finished = false;
         drawingThread =  StartCoroutine(ChangeTheColor(rez, imz));
+        progressBar.StartProgressBarJulia();
+
     }
 
     public void StopDrawingCorroutine(){

@@ -26,12 +26,15 @@ public class CPUFractalController : MonoBehaviour
     double viewPortX, viewPortY;
 
     private LogsController logsController;
+
+    private ProgressBarController progressBar;
     private Image mandelbrotImage;
     void Awake()
     {   
         finished = false;
         logsController = GameObject.FindGameObjectWithTag("LogsController").GetComponent<LogsController>();
         mandelbrotImage = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<Image>();
+        progressBar = GameObject.Find("Utilities Mandelbrot/Progress Bar Mandelbrot").GetComponent<ProgressBarController>();
         //results = new Color[pwidth, pheight];
         //resultArray = new NativeArray<Color>(pwidth * pheight, Allocator.Persistent);
         double ratio = pwidth / pheight;
@@ -57,12 +60,18 @@ public class CPUFractalController : MonoBehaviour
         finished = true;
     }
 
+    void OnEnable()
+    {
+        StartDraw();
+    }
+
     public void StartDraw(){
         try{
             StopCoroutine(drawingThread);
         }catch{}
         finished = false;
-        drawingThread =  StartCoroutine(ChangeTheColor());
+        drawingThread = StartCoroutine(ChangeTheColor());
+        progressBar.StartProgressBarMandelbrot();
         
     }
 

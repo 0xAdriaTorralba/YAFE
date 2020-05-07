@@ -10,7 +10,7 @@ public class InterfaceController : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    private TextMeshProUGUI mandelbrotNumber, juliaNumber;
+    private TextMeshProUGUI mandelbrotNumber;
 
     private CPUFractalController fractalMandelbrot;
     private CPUJuliaController fractalJulia;
@@ -26,17 +26,19 @@ public class InterfaceController : MonoBehaviour
     private TMP_InputField textZoomM, textPanXM, textPanYM;
     private TMP_InputField textZoomJ, textPanXJ, textPanYJ;
 
+    private TMP_InputField realPartJulia, imaginaryPartJulia;
+
     private const string format = "F8";
 
     private double rez, imz;
 
-    private List<TMP_InputField> inputFields;
+    private List<TMP_InputField> inputFields, inputFieldsJulia;
 
-    private List<string> previousValues;
+    private List<string> previousValues, previousValuesJulia;
 
     private LogsController logsController;
     
-    private bool allowEnter;
+    private bool allowEnter, allowEnterJulia;
 
 
     private double defaultZoom, defaultMovement;
@@ -47,7 +49,7 @@ public class InterfaceController : MonoBehaviour
         logsController = GameObject.FindGameObjectWithTag("LogsController").GetComponent<LogsController>();
 
         mandelbrotNumber = GameObject.Find("Complex Number Mandelbrot/Mandelbrot Text").GetComponent<TextMeshProUGUI>();
-        juliaNumber = GameObject.Find("Complex Number Julia/Julia Text").GetComponent<TextMeshProUGUI>();
+        //juliaNumber = GameObject.Find("Complex Number Julia/Julia Text").GetComponent<TextMeshProUGUI>();
 
 
         fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<CPUFractalController>();
@@ -69,8 +71,13 @@ public class InterfaceController : MonoBehaviour
         textPanXJ = GameObject.Find("Utilities Julia/Text Inputs/Pan X Input Field").GetComponent<TMP_InputField>();
         textPanYJ = GameObject.Find("Utilities Julia/Text Inputs/Pan Y Input Field").GetComponent<TMP_InputField>();
 
+        realPartJulia = GameObject.Find("Complex Number Julia/Input Real Julia").GetComponent<TMP_InputField>();
+        imaginaryPartJulia = GameObject.Find("Complex Number Julia/Input Imaginary Julia").GetComponent<TMP_InputField>();
+
         inputFields = new List<TMP_InputField>();
+        inputFieldsJulia = new List<TMP_InputField>();
         previousValues = new List<string>();
+        previousValuesJulia = new List<string>();
 
         inputFields.Add(textZoomM);
         inputFields.Add(textPanXM);
@@ -79,6 +86,9 @@ public class InterfaceController : MonoBehaviour
         inputFields.Add(textZoomJ);
         inputFields.Add(textPanXJ);
         inputFields.Add(textPanYJ);
+
+        inputFieldsJulia.Add(realPartJulia);
+        inputFieldsJulia.Add(imaginaryPartJulia);
 
         eventSystem = GameObject.FindGameObjectWithTag("EventSystem");
 
@@ -142,8 +152,12 @@ public class InterfaceController : MonoBehaviour
         previousValues.Add(textZoomJ.text);
         previousValues.Add(textPanXJ.text);
         previousValues.Add(textPanYJ.text);
+
+        previousValuesJulia.Add("0.0");
+        previousValuesJulia.Add("0.0");
         
         allowEnter = false;
+        allowEnterJulia = false;
 
         StartCoroutine(ListenerFractal());
 
@@ -298,13 +312,20 @@ public class InterfaceController : MonoBehaviour
         progressBarControllerJulia.StartProgressBarJulia();
     }
 
+    private void RefreshFractalJulia(double rez, double imz){
+        UpdateJuliaRenderingValues();
+        fractalJulia.StopDrawingCorroutine();
+        fractalJulia.StartDraw(rez, imz);
+        progressBarControllerJulia.StartProgressBarJulia();
+    }
+
     // Update is called once per frame
     void Update()
     {
         if(Input.GetMouseButtonDown(0) && coordinatesListener.getIsPointerIn()){
             fractalJulia.StartDraw(rez, imz);
-            if (imz < 0) juliaNumber.text = "c = "+ rez + " - i "+ Math.Abs(imz);
-            else juliaNumber.text = "c = "+ rez + " + i "+ imz;
+            realPartJulia.text = rez + "";
+            imaginaryPartJulia.text = imz + "";
             progressBarControllerJulia.StartProgressBarJulia();
         }
 
@@ -316,7 +337,43 @@ public class InterfaceController : MonoBehaviour
                 allowEnter = allowEnter || input.isFocused;
             }
         }
+
+        if (allowEnterJulia && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))){
+            StartCoroutine(OnSubmitJulia());
+        }else{
+            allowEnterJulia = realPartJulia.isFocused || imaginaryPartJulia.isFocused;
+        }
         
+    }
+
+    private IEnumerator OnSubmitJulia(){
+        yield return new WaitForEndOfFrame();
+        double result;
+        bool error = false;
+        bool changed = false;
+        for (int i = 0; i < inputFieldsJulia.Count - 1; i++){
+            if (!string.Equals(inputFieldsJulia[i].text, previousValuesJulia[i])){
+                changed = true;
+            }
+            if (double.TryParse(inputFieldsJulia[i].text, out result)){
+                inputFieldsJulia[i].text = result.ToString(format);
+                continue;
+            }else{
+                logsController.UpdateLogs(new String[] {"Error parsing Julia " + inputFieldsJulia[i].name + ". Cannot parse '" + inputFieldsJulia[i].text + "' to double."}, "#FFA600");
+                yield return new WaitForSeconds(0.5f);
+                inputFieldsJulia[i].text = previousValuesJulia[i];
+                error = true;
+            }
+        }
+        if (!error && changed){
+            rez = double.Parse(inputFieldsJulia[0].text);
+            imz = double.Parse(inputFieldsJulia[1].text);
+            RefreshFractalJulia(rez, imz);
+        }
+
+        for (int i = 0; i < previousValuesJulia.Count - 1; i++){
+            previousValuesJulia[i] = inputFieldsJulia[i].text;
+        }
     }
 
     private IEnumerator OnSubmit(){
