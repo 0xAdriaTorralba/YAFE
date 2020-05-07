@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ProgressBarController : MonoBehaviour
 {
@@ -14,14 +15,14 @@ public class ProgressBarController : MonoBehaviour
     private Image progressBar;
     public string attatch;
 
-    private Text percentage;
+    private TextMeshProUGUI percentage;
 
     private Coroutine pbMandelbrot = null, pbJulia = null;
     void Start()
     {
         fractalRenderer = GameObject.FindGameObjectWithTag(attatch);
         progressBar = this.transform.Find("Bar").GetComponent<Image>();
-        percentage = this.transform.Find("Percentage").GetComponent<Text>();
+        percentage = this.transform.Find("Percentage").GetComponent<TextMeshProUGUI>();
         if (attatch.Equals("Mandelbrot")){ 
             fractalMandelbrot = fractalRenderer.GetComponent<CPUFractalController>();
             pbMandelbrot = StartCoroutine(UpdateProgressBarMandelbrot(fractalMandelbrot));

@@ -77,7 +77,7 @@ public class CPUJuliaController : MonoBehaviour
     public void StopDrawingCorroutine(){
         try{
             StopCoroutine(drawingThread);
-            logsController.UpdateLogs(new string[] {"Julia drawing corroutine stopped."}, "#ff0000ff");
+            logsController.UpdateLogs(new string[] {"Julia drawing corroutine stopped."}, "#FFA600");
             count = 0;
             brush = new Texture2D((int)pwidth, (int)pheight);
         }catch {}
@@ -229,7 +229,7 @@ public class CPUJuliaController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         finished = true;
 
-        logsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully."}, "#00ff00ff");
+        logsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully!"}, "#75FF00");
 
         
     }

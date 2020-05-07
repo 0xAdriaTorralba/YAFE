@@ -19,7 +19,7 @@ public class CoordinatesListener : MonoBehaviour, IPointerEnterHandler, IPointer
     }
 
     public void OnPointerClick(PointerEventData eventData){
-        Debug.Log("Clicked at: " + eventData.position);
+        
     }
 
     public void OnPointerEnter(PointerEventData eventData){
@@ -37,6 +37,10 @@ public class CoordinatesListener : MonoBehaviour, IPointerEnterHandler, IPointer
             y = (double)localClick.y + (_screenRectTransform.rect.height / 2.0);
             yield return null;
         }
+    }
+
+    public bool getIsPointerIn(){
+        return this.isPointerIn;
     }
 
     public void OnPointerExit(PointerEventData eventData){
