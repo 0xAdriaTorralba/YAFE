@@ -155,7 +155,7 @@ public class InterfaceController : MonoBehaviour
         allowEnter = false;
         allowEnterJulia = false;
 
-        StartCoroutine(ListenerFractal());
+        
 
     }
 
@@ -172,6 +172,7 @@ public class InterfaceController : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         RefreshFractalMandelbrot();
         RefreshFractalJulia();
+        StartCoroutine(ListenerFractal());
     }
 
     private void ZoomInMandelbrot(double defaultZoom){
