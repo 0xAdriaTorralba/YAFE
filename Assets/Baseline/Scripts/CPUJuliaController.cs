@@ -58,8 +58,8 @@ public class CPUJuliaController : MonoBehaviour
     public void Start(){
         //drawingThread = StartCoroutine(StartDraw(0.0, 0.0));
         drawingThread = null;
-        StartDraw(0.0, 0.0);
-        RedrawCurrent();
+        //StartDraw(0.0, 0.0);
+        //RedrawCurrent();
         finished = true;
     }
 
@@ -76,7 +76,9 @@ public class CPUJuliaController : MonoBehaviour
         this.rez = rez;
         this.imz = imz;
         drawingThread = StartCoroutine(ChangeTheColor(rez, imz));
-        progressBar.StartProgressBarJulia();
+        try{
+            progressBar.StartProgressBarJulia();
+        }catch{}
     }
 
     public void RedrawCurrent(){
@@ -92,7 +94,7 @@ public class CPUJuliaController : MonoBehaviour
     public void StopDrawingCorroutine(){
         try{
             StopCoroutine(drawingThread);
-            logsController.UpdateLogs(new string[] {"Julia drawing corroutine stopped."}, "#FFA600");
+            LogsController.UpdateLogs(new string[] {"Julia drawing corroutine stopped."}, "#FFA600");
             count = 0;
             brush = new Texture2D((int)pwidth, (int)pheight);
         }catch {}
@@ -192,7 +194,7 @@ public class CPUJuliaController : MonoBehaviour
     }*/
 
     IEnumerator ChangeTheColor(double rez, double imz){
-        logsController.UpdateLogs(new string[] {"Julia drawing corroutine started."}, "	#ffffffff");
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine started."}, "	#ffffffff");
 
         yield return null;
         int i;
@@ -244,7 +246,7 @@ public class CPUJuliaController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         finished = true;
 
-        logsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully!"}, "#75FF00");
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully!"}, "#75FF00");
 
         
     }

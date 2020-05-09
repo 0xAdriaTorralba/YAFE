@@ -6,32 +6,24 @@ using System;
 
 public class LogsController : MonoBehaviour
 {
-    private GameObject logsBar;
-    private Text textLogs;
+    private static Text textLogs;
 
-    private Queue<string> logs;
+    private static Queue<string> logs;
+    private static LogsController instance;
 
     void Awake(){
-        // Gather all info about logs before deactivate it.
-        logsBar = GameObject.FindGameObjectWithTag("Logs");
+        instance = this;
+    }
+
+    public static void UpdateLogs(string[] newLogs, String color){
+        if (logs == null){
+            logs = new Queue<string>();
+        }
         textLogs = GameObject.FindGameObjectWithTag("TextLogs").GetComponent<Text>();
-        DeactivateLogs();
-        logs = new Queue<string>();
+        instance.StartCoroutine(DisplayNextLog(newLogs, color));
     }
 
-    public void ActivateLogs(){
-        logsBar.SetActive(true);
-    }
-
-    public void DeactivateLogs(){
-        logsBar.SetActive(false);
-    }
-
-    public void UpdateLogs(string[] newLogs, String color){
-        StartCoroutine(DisplayNextLog(newLogs, color));
-    }
-
-    private IEnumerator DisplayNextLog(string[] newLogs, String color){
+    private static IEnumerator DisplayNextLog(string[] newLogs, String color){
         yield return new WaitForEndOfFrame();
 
         logs.Clear();
@@ -42,7 +34,6 @@ public class LogsController : MonoBehaviour
         if (logs.Count == 0){
             yield break;
         }
-        ActivateLogs();
         DateTime date = DateTime.Now;
         string newLog = logs.Dequeue();
         newLog = "<color=" + color + ">" + '<' + DateTime.Now.ToString("HH:mm:ss") + "> " + newLog + "</color>";

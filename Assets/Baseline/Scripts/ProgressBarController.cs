@@ -9,9 +9,9 @@ public class ProgressBarController : MonoBehaviour
     // Start is called before the first frame update
 
     private GameObject fractalRenderer;
-    public CPUFractalController fractalMandelbrot;
+    public Mandelbrot fractalMandelbrot;
 
-    public CPUJuliaController fractalJulia;
+    public Julia fractalJulia;
     private Image progressBar;
     public string attatch;
 
@@ -24,26 +24,26 @@ public class ProgressBarController : MonoBehaviour
         progressBar = this.transform.Find("Bar").GetComponent<Image>();
         percentage = this.transform.Find("Percentage").GetComponent<TextMeshProUGUI>();
         if (attatch.Equals("Mandelbrot")){ 
-            fractalMandelbrot = fractalRenderer.GetComponent<CPUFractalController>();
+            fractalMandelbrot = fractalRenderer.GetComponent<Mandelbrot>();
             pbMandelbrot = StartCoroutine(UpdateProgressBarMandelbrot(fractalMandelbrot));
         }else{
-            fractalJulia = fractalRenderer.GetComponent<CPUJuliaController>();
+            fractalJulia = fractalRenderer.GetComponent<Julia>();
             pbJulia = StartCoroutine(UpdateProgressBarJulia(fractalJulia));
         } 
         
     }
 
     void Update(){
-        if (attatch.Equals("Mandelbrot")){
-            if (!fractalMandelbrot.GetFinished() && pbMandelbrot != null){
-                StartProgressBarMandelbrot();
-            }
-        }
-        if (attatch.Equals("Julia")){
-            if (!fractalJulia.GetFinished() && pbJulia != null){
-                StartProgressBarJulia();
-            }
-        }
+        // if (attatch.Equals("Mandelbrot")){
+        //     if (!fractalMandelbrot.GetFinished() && pbMandelbrot != null){
+        //         StartProgressBarMandelbrot();
+        //     }
+        // }
+        // if (attatch.Equals("Julia")){
+        //     if (!fractalJulia.GetFinished() && pbJulia != null){
+        //         StartProgressBarJulia();
+        //     }
+        // }
     }
 
     public void StartProgressBarMandelbrot(){
@@ -54,7 +54,7 @@ public class ProgressBarController : MonoBehaviour
         pbJulia = StartCoroutine(UpdateProgressBarJulia(fractalJulia));
     }
 
-    IEnumerator UpdateProgressBarMandelbrot(CPUFractalController fractalController){
+    IEnumerator UpdateProgressBarMandelbrot(Mandelbrot fractalController){
         while(!fractalController.GetFinished()){
             progressBar.fillAmount = (float)fractalController.GetProgress();
             percentage.text = (int)(fractalController.GetProgress() * 100)+ "";
@@ -62,7 +62,7 @@ public class ProgressBarController : MonoBehaviour
         }
     }
 
-    IEnumerator UpdateProgressBarJulia(CPUJuliaController fractalController){
+    IEnumerator UpdateProgressBarJulia(Julia fractalController){
         while(!fractalController.GetFinished()){
             progressBar.fillAmount = (float)fractalController.GetProgress();
             percentage.text = (int)(fractalController.GetProgress() * 100)+ "";

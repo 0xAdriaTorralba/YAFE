@@ -8,7 +8,7 @@ public class CoordinatesListener : MonoBehaviour, IPointerEnterHandler, IPointer
 {
     private double x, y;
 
-    private bool isPointerIn = false;
+    public bool isPointerIn = false;
 
     private Coroutine coroutine;
 

@@ -12,8 +12,8 @@ public class InterfaceController : MonoBehaviour
 
     private TextMeshProUGUI mandelbrotNumber;
 
-    private CPUFractalController fractalMandelbrot;
-    private CPUJuliaController fractalJulia;
+    private Mandelbrot fractalMandelbrot;
+    private Julia fractalJulia;
     private ProgressBarController progressBarControllerMandelbrot, progressBarControllerJulia;
 
     private CoordinatesListener coordinatesListener;
@@ -35,8 +35,6 @@ public class InterfaceController : MonoBehaviour
     private List<TMP_InputField> inputFields, inputFieldsJulia;
 
     private List<string> previousValues, previousValuesJulia;
-
-    private LogsController logsController;
     
     private bool allowEnter, allowEnterJulia;
 
@@ -46,14 +44,12 @@ public class InterfaceController : MonoBehaviour
     {
         
         // Finds
-        logsController = GameObject.FindGameObjectWithTag("LogsController").GetComponent<LogsController>();
-
         mandelbrotNumber = GameObject.Find("Complex Number Mandelbrot/Mandelbrot Text").GetComponent<TextMeshProUGUI>();
         //juliaNumber = GameObject.Find("Complex Number Julia/Julia Text").GetComponent<TextMeshProUGUI>();
 
 
-        fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<CPUFractalController>();
-        fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<CPUJuliaController>();
+        fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<Mandelbrot>();
+        fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<Julia>();
 
 
         progressBarControllerJulia = GameObject.Find("Progress Bar Julia").GetComponent<ProgressBarController>();
@@ -136,14 +132,14 @@ public class InterfaceController : MonoBehaviour
         rightJulia.onClick.AddListener(() => RightJulia(defaultMovement));
         refreshJulia.onClick.AddListener(() => RefreshFractalJulia());
         
-        textZoomM.text = fractalMandelbrot.xmax.ToString(format);
-        textZoomJ.text = fractalJulia.xmax.ToString(format);
+        textZoomM.text = fractalMandelbrot.rp.xmax.ToString(format);
+        textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
 
-        textPanXM.text = fractalMandelbrot.panX.ToString(format);
-        textPanXJ.text = fractalJulia.panX.ToString(format);
+        textPanXM.text = fractalMandelbrot.rp.panX.ToString(format);
+        textPanXJ.text = fractalJulia.rp.panX.ToString(format);
 
-        textPanYM.text = fractalMandelbrot.panY.ToString(format);
-        textPanYJ.text = fractalJulia.panY.ToString(format);
+        textPanYM.text = fractalMandelbrot.rp.panY.ToString(format);
+        textPanYJ.text = fractalJulia.rp.panY.ToString(format);
 
         previousValues.Add(textZoomM.text);
         previousValues.Add(textPanXM.text);
@@ -163,13 +159,26 @@ public class InterfaceController : MonoBehaviour
 
     }
 
- 
+    void OnEnable(){
+        StartCoroutine(OnEnableCoroutine());
+    }
+
+    void OnDisable(){
+        OnSubmit();
+        OnSubmitJulia();
+    }
+
+    private IEnumerator OnEnableCoroutine(){
+        yield return new WaitForSeconds(0.1f);
+        RefreshFractalMandelbrot();
+        RefreshFractalJulia();
+    }
 
     private void ZoomInMandelbrot(double defaultZoom){
-        fractalMandelbrot.xmax *= defaultZoom;
-        fractalMandelbrot.ymax *= defaultZoom;
+        fractalMandelbrot.rp.xmax *= defaultZoom;
+        fractalMandelbrot.rp.ymax *= defaultZoom;
 
-        textZoomM.text = fractalMandelbrot.xmax.ToString(format);
+        textZoomM.text = fractalMandelbrot.rp.xmax.ToString(format);
 
         //fractalMandelbrot.xmax = Mathf.Max((float)fractalMandelbrot.xmax, 1e-14f);
         //fractalMandelbrot.ymax = Mathf.Max((float)fractalMandelbrot.ymax, 1e-14f);
@@ -178,10 +187,10 @@ public class InterfaceController : MonoBehaviour
     }
 
     private void ZoomOutMandelbrot(double defaultZoom){
-        fractalMandelbrot.xmax /= defaultZoom;
-        fractalMandelbrot.ymax /= defaultZoom;
+        fractalMandelbrot.rp.xmax /= defaultZoom;
+        fractalMandelbrot.rp.ymax /= defaultZoom;
 
-        textZoomM.text = fractalMandelbrot.xmax.ToString(format);
+        textZoomM.text = fractalMandelbrot.rp.xmax.ToString(format);
 
         //fractalMandelbrot.xmax = Mathf.Min((float)fractalMandelbrot.xmax, 2);
         //fractalMandelbrot.ymax = Mathf.Min((float)fractalMandelbrot.ymax, 2);
@@ -190,9 +199,9 @@ public class InterfaceController : MonoBehaviour
     }
 
     private void UpMandelbrot(double defaultMovement){
-        fractalMandelbrot.panY += defaultMovement;
+        fractalMandelbrot.rp.panY += defaultMovement;
 
-        textPanYM.text = fractalMandelbrot.panY.ToString(format);
+        textPanYM.text = fractalMandelbrot.rp.panY.ToString(format);
 
         //fractalMandelbrot.panY = Mathf.Min((float) fractalMandelbrot.panY, 2);
 
@@ -200,9 +209,9 @@ public class InterfaceController : MonoBehaviour
     }
 
     private void DownMandelbrot(double defaultMovement){
-        fractalMandelbrot.panY -= defaultMovement;
+        fractalMandelbrot.rp.panY -= defaultMovement;
 
-        textPanYM.text = fractalMandelbrot.panY.ToString(format);
+        textPanYM.text = fractalMandelbrot.rp.panY.ToString(format);
 
         //fractalMandelbrot.panY = Mathf.Max((float) fractalMandelbrot.panY, -2);
 
@@ -210,9 +219,9 @@ public class InterfaceController : MonoBehaviour
     }
 
     private void LeftMandelbrot(double defaultMovement){
-        fractalMandelbrot.panX -= defaultMovement;
+        fractalMandelbrot.rp.panX -= defaultMovement;
 
-        textPanXM.text = fractalMandelbrot.panX.ToString(format);
+        textPanXM.text = fractalMandelbrot.rp.panX.ToString(format);
 
         //fractalMandelbrot.panX = Mathf.Max((float) fractalMandelbrot.panX, -2);
 
@@ -220,9 +229,9 @@ public class InterfaceController : MonoBehaviour
     }
 
     private void RightMandelbrot(double defaultMovement){
-        fractalMandelbrot.panX += defaultMovement;
+        fractalMandelbrot.rp.panX += defaultMovement;
 
-        textPanXM.text = fractalMandelbrot.panX.ToString(format);
+        textPanXM.text = fractalMandelbrot.rp.panX.ToString(format);
 
 
         //fractalMandelbrot.panX = Mathf.Min((float) fractalMandelbrot.panX, 2);
@@ -232,16 +241,15 @@ public class InterfaceController : MonoBehaviour
 
     private void RefreshFractalMandelbrot(){
         UpdateMandelbrotRenderingValues();
-        fractalMandelbrot.StopDrawingCorroutine();
         fractalMandelbrot.StartDraw();
         progressBarControllerMandelbrot.StartProgressBarMandelbrot();
     }
 
     private void ZoomInJulia(double defaultZoom){
-        fractalJulia.xmax *= defaultZoom;
-        fractalJulia.ymax *= defaultZoom;
+        fractalJulia.rp.xmax *= defaultZoom;
+        fractalJulia.rp.ymax *= defaultZoom;
 
-        textZoomJ.text = fractalJulia.xmax.ToString(format);
+        textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
 
         //fractalJulia.xmax = Mathf.Max((float)fractalJulia.xmax, 1e-14f);
         //fractalJulia.ymax = Mathf.Max((float)fractalJulia.ymax, 1e-14f);
@@ -250,10 +258,10 @@ public class InterfaceController : MonoBehaviour
     }
 
     private void ZoomOutJulia(double defaultZoom){
-        fractalJulia.xmax /= defaultZoom;
-        fractalJulia.ymax /= defaultZoom;
+        fractalJulia.rp.xmax /= defaultZoom;
+        fractalJulia.rp.ymax /= defaultZoom;
 
-        textZoomJ.text = fractalJulia.xmax.ToString(format);
+        textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
 
 
         //fractalJulia.xmax = Mathf.Min((float)fractalJulia.xmax, 2);
@@ -263,9 +271,9 @@ public class InterfaceController : MonoBehaviour
     }
 
        private void UpJulia(double defaultMovement){
-        fractalJulia.panY += defaultMovement;
+        fractalJulia.rp.panY += defaultMovement;
 
-        textPanYJ.text = fractalJulia.panY.ToString(format);
+        textPanYJ.text = fractalJulia.rp.panY.ToString(format);
 
         //fractalJulia.panY = Mathf.Min((float) fractalJulia.panY, 2);
 
@@ -273,9 +281,9 @@ public class InterfaceController : MonoBehaviour
     }
 
     private void DownJulia(double defaultMovement){
-        fractalJulia.panY -= defaultMovement;
+        fractalJulia.rp.panY -= defaultMovement;
 
-        textPanYJ.text = fractalJulia.panY.ToString(format);
+        textPanYJ.text = fractalJulia.rp.panY.ToString(format);
 
 
         //fractalJulia.panY = Mathf.Max((float) fractalJulia.panY, -2);
@@ -284,9 +292,9 @@ public class InterfaceController : MonoBehaviour
     }
 
     private void LeftJulia(double defaultMovement){
-        fractalJulia.panX -= defaultMovement;
+        fractalJulia.rp.panX -= defaultMovement;
 
-        textPanXJ.text = fractalJulia.panX.ToString(format);
+        textPanXJ.text = fractalJulia.rp.panX.ToString(format);
 
         //fractalJulia.panX = Mathf.Max((float) fractalJulia.panX, -2);
 
@@ -294,9 +302,9 @@ public class InterfaceController : MonoBehaviour
     }
 
     private void RightJulia(double defaultMovement){
-        fractalJulia.panX += defaultMovement;
+        fractalJulia.rp.panX += defaultMovement;
 
-        textPanXJ.text = fractalJulia.panX.ToString(format);
+        textPanXJ.text = fractalJulia.rp.panX.ToString(format);
 
 
         //fractalJulia.panX = Mathf.Min((float) fractalJulia.panX, 2);
@@ -307,14 +315,12 @@ public class InterfaceController : MonoBehaviour
 
     private void RefreshFractalJulia(){
         UpdateJuliaRenderingValues();
-        fractalJulia.StopDrawingCorroutine();
         fractalJulia.RedrawCurrent();
         progressBarControllerJulia.StartProgressBarJulia();
     }
 
     private void RefreshFractalJulia(double rez, double imz){
         UpdateJuliaRenderingValues();
-        fractalJulia.StopDrawingCorroutine();
         fractalJulia.StartDraw(rez, imz);
         progressBarControllerJulia.StartProgressBarJulia();
     }
@@ -359,7 +365,7 @@ public class InterfaceController : MonoBehaviour
                 inputFieldsJulia[i].text = result.ToString(format);
                 continue;
             }else{
-                logsController.UpdateLogs(new String[] {"Error parsing Julia " + inputFieldsJulia[i].name + ". Cannot parse '" + inputFieldsJulia[i].text + "' to double."}, "#FFA600");
+                LogsController.UpdateLogs(new String[] {"Error parsing Julia " + inputFieldsJulia[i].name + ". Cannot parse '" + inputFieldsJulia[i].text + "' to double."}, "#FFA600");
                 yield return new WaitForSeconds(0.5f);
                 inputFieldsJulia[i].text = previousValuesJulia[i];
                 error = true;
@@ -389,7 +395,7 @@ public class InterfaceController : MonoBehaviour
                 inputFields[i].text = result.ToString(format);
                 continue;
             }else{
-                logsController.UpdateLogs(new string[] {"Error parsing Mandelbrot " + inputFields[i].name + ". Cannot parse '" + inputFields[i].text + "' to double."}, "#FFA600");
+                LogsController.UpdateLogs(new string[] {"Error parsing Mandelbrot " + inputFields[i].name + ". Cannot parse '" + inputFields[i].text + "' to double."}, "#FFA600");
                 yield return new WaitForSeconds(0.5f);
                 inputFields[i].text = previousValues[i];
                 error = true;
@@ -411,7 +417,7 @@ public class InterfaceController : MonoBehaviour
                 inputFields[i].text = result.ToString(format);
                 continue;
             }else{
-                logsController.UpdateLogs(new string[] {"Error parsing Julia " + inputFields[i].name + ". Cannot parse '"+inputFields[i].text+ "' to double."}, "#FFA600");
+                LogsController.UpdateLogs(new string[] {"Error parsing Julia " + inputFields[i].name + ". Cannot parse '"+inputFields[i].text+ "' to double."}, "#FFA600");
                 yield return new WaitForSeconds(0.5f);
                 inputFields[i].text = previousValues[i];
                 error = true;
@@ -424,52 +430,36 @@ public class InterfaceController : MonoBehaviour
 
         for (int i = 0; i < 6; i++){
             previousValues[i] = inputFields[i].text;
-        }
-
-        
-       
+        } 
 
     }
 
 
     private void UpdateMandelbrotRenderingValues(){
-        fractalMandelbrot.xmax = Double.Parse(inputFields[0].text);
-        fractalMandelbrot.ymax = Double.Parse(inputFields[0].text);
-        fractalMandelbrot.panX = Double.Parse(inputFields[1].text);
-        fractalMandelbrot.panY = Double.Parse(inputFields[2].text);
+        fractalMandelbrot.rp.xmax = Double.Parse(inputFields[0].text);
+        fractalMandelbrot.rp.ymax = Double.Parse(inputFields[0].text);
+        fractalMandelbrot.rp.panX = Double.Parse(inputFields[1].text);
+        fractalMandelbrot.rp.panY = Double.Parse(inputFields[2].text);
     }
 
     private void UpdateJuliaRenderingValues(){
-        fractalJulia.xmax = Double.Parse(inputFields[3].text);
-        fractalJulia.ymax = Double.Parse(inputFields[3].text);
-        fractalJulia.panX = Double.Parse(inputFields[4].text);
-        fractalJulia.panY = Double.Parse(inputFields[5].text);
+        fractalJulia.rp.xmax = Double.Parse(inputFields[3].text);
+        fractalJulia.rp.ymax = Double.Parse(inputFields[3].text);
+        fractalJulia.rp.panX = Double.Parse(inputFields[4].text);
+        fractalJulia.rp.panY = Double.Parse(inputFields[5].text);
     }
 
     IEnumerator ListenerFractal(){
         while (true){
-            rez = fractalMandelbrot.GetViewPortX(coordinatesListener.getX());
-            imz = fractalMandelbrot.GetViewPortY(coordinatesListener.getY());
-            if (imz < 0) mandelbrotNumber.text = "z = "+ rez + " - i "+ Math.Abs(imz);
-            else mandelbrotNumber.text = "z = "+ rez + " + i "+ imz;
-            yield return null;
+            if (coordinatesListener.getIsPointerIn()){
+                rez = fractalMandelbrot.GetViewPortX(coordinatesListener.getX());
+                imz = fractalMandelbrot.GetViewPortY(coordinatesListener.getY());
+                if (imz < 0) mandelbrotNumber.text = "z = "+ rez + " - i "+ Math.Abs(imz);
+                else mandelbrotNumber.text = "z = "+ rez + " + i "+ imz;
+            }
+            yield return new WaitForEndOfFrame();
+
         }
-        yield return new WaitForEndOfFrame();
-    }
-
-    public void StopAllDrawingCoroutines(){
-        fractalMandelbrot.StopDrawingCorroutine();
-        fractalJulia.StopDrawingCorroutine();
-    }
-
-    public void StartDrawing(){
-        fractalMandelbrot.StartDraw();
-        progressBarControllerMandelbrot.StartProgressBarMandelbrot();
-    }
-
-    public void RestartDrawingCoroutines(){
-        StopAllDrawingCoroutines();
-        StartDrawing();
     }
 
 

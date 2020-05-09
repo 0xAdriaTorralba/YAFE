@@ -22,7 +22,7 @@ public class TabGroupMain : MonoBehaviour
 
 
     void Awake(){
-        interfaceController = GameObject.FindGameObjectWithTag("InterfaceController").GetComponent<InterfaceController>();
+        //interfaceController = GameObject.FindGameObjectWithTag("InterfaceController").GetComponent<InterfaceController>();
 
         
     }

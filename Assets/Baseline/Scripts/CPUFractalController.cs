@@ -34,7 +34,6 @@ public class CPUFractalController : MonoBehaviour
         finished = false;
         logsController = GameObject.FindGameObjectWithTag("LogsController").GetComponent<LogsController>();
         mandelbrotImage = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<Image>();
-        progressBar = GameObject.Find("Utilities Mandelbrot/Progress Bar Mandelbrot").GetComponent<ProgressBarController>();
         //results = new Color[pwidth, pheight];
         //resultArray = new NativeArray<Color>(pwidth * pheight, Allocator.Persistent);
         double ratio = pwidth / pheight;
@@ -54,7 +53,7 @@ public class CPUFractalController : MonoBehaviour
 
     void Start(){
         drawingThread = null;
-        StartDraw();
+        //StartDraw();
         //StartDraw();
         //drawingThread = StartCoroutine(ChangeTheColor());
         finished = true;
@@ -71,14 +70,16 @@ public class CPUFractalController : MonoBehaviour
         }catch{}
         finished = false;
         drawingThread = StartCoroutine(ChangeTheColor());
-        progressBar.StartProgressBarMandelbrot();
+        try{
+            progressBar.StartProgressBarMandelbrot();
+        }catch{}
         
     }
 
     public void StopDrawingCorroutine(){
         try{
             StopCoroutine(drawingThread);
-            logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine stopped."}, "#FFA600");
+            LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine stopped."}, "#FFA600");
             count = 0;
             brush = new Texture2D((int)pwidth, (int)pheight);
         }catch {}
@@ -186,7 +187,6 @@ public class CPUFractalController : MonoBehaviour
 
     IEnumerator ChangeTheColor(){
         yield return null;
-        logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine started."}, "#ffffffff");
 
         int i;
         int x, y;
@@ -237,7 +237,7 @@ public class CPUFractalController : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         finished = true;
 
-        logsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully!"}, "#75FF00");
+        LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully!"}, "#75FF00");
         
     }
         
