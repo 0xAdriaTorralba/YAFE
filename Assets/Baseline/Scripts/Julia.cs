@@ -27,7 +27,17 @@ public class Julia : Fractal
             this.reZ = rez;
             this.imZ = imz;
             rp.finished = false;
-            rp.drawingThread = StartCoroutine(Draw(rez, imz));
+            switch(fp.algorithm){
+                case "Escape Algorithm":
+                    rp.drawingThread = StartCoroutine(Draw(rez, imz));
+                    break;
+                case "Another Algorithm":
+                    break;
+                default:
+                    rp.drawingThread = StartCoroutine(Draw(rez, imz));
+                    break;
+
+            }
         }
     }
 
@@ -41,7 +51,17 @@ public class Julia : Fractal
             Debug.Log("There is no Julia drawing coroutine running.");
         }finally {
             rp.finished = false;
-            rp.drawingThread = StartCoroutine(Draw(reZ, imZ));
+            switch(fp.algorithm){
+                case "Escape Algorithm":
+                    rp.drawingThread = StartCoroutine(Draw(reZ, imZ));
+                    break;
+                case "Another Algorithm":
+                    break;
+                default:
+                    rp.drawingThread = StartCoroutine(Draw(reZ, imZ));
+                    break;
+
+            }
         }
     }
 
@@ -75,7 +95,17 @@ public class Julia : Fractal
                 if (i == fp.maxIters){
                     value = new Color(0.0f, 0.0f, 0.0f, 1.0f);
                 }else{
-                    value = new Color(Mathf.Sin((float)i/4) / 4.0f + 0.75f, Mathf.Sin((float)i/5) / 4.0f + 0.75f, Mathf.Sin((float)i/7) / 4.0f + 0.75f, 1.0f);               
+                    switch (fp.colorMap){
+                        case "Colormap 1":
+                            value = new Color(Mathf.Sin((float)i/4) / 4.0f + 0.75f, Mathf.Sin((float)i/5) / 4.0f + 0.75f, Mathf.Sin((float)i/7) / 4.0f + 0.75f, 1.0f);
+                            break;
+                        case "Black and White":
+                            value = new Color(1.0f, 1.0f, 1.0f, 1.0f); 
+                            break;
+                        default:
+                            value = new Color(Mathf.Sin((float)i/4) / 4.0f + 0.75f, Mathf.Sin((float)i/5) / 4.0f + 0.75f, Mathf.Sin((float)i/7) / 4.0f + 0.75f, 1.0f);
+                            break;
+                    }
                 }
                 rp.count++;
                 rp.tex2D.SetPixel((int) x, (int) y, value);

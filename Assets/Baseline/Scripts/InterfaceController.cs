@@ -240,7 +240,7 @@ public class InterfaceController : MonoBehaviour
         RefreshFractalMandelbrot();
     }
 
-    private void RefreshFractalMandelbrot(){
+    public void RefreshFractalMandelbrot(){
         UpdateMandelbrotRenderingValues();
         fractalMandelbrot.StartDraw();
         progressBarControllerMandelbrot.StartProgressBarMandelbrot();
@@ -314,7 +314,7 @@ public class InterfaceController : MonoBehaviour
     }
 
 
-    private void RefreshFractalJulia(){
+    public void RefreshFractalJulia(){
         UpdateJuliaRenderingValues();
         fractalJulia.RedrawCurrent();
         progressBarControllerJulia.StartProgressBarJulia();
@@ -347,6 +347,7 @@ public class InterfaceController : MonoBehaviour
 
         if (allowEnterJulia && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))){
             StartCoroutine(OnSubmitJulia());
+            allowEnterJulia = false;
         }else{
             allowEnterJulia = realPartJulia.isFocused || imaginaryPartJulia.isFocused;
         }
@@ -358,15 +359,21 @@ public class InterfaceController : MonoBehaviour
         double result;
         bool error = false;
         bool changed = false;
-        for (int i = 0; i < inputFieldsJulia.Count - 1; i++){
+        for (int i = 0; i < 2; i++){
             if (!string.Equals(inputFieldsJulia[i].text, previousValuesJulia[i])){
                 changed = true;
+            }
+            if (inputFieldsJulia[i].text.Length == 0){
+                LogsController.UpdateLogs(new string[] {inputFieldsJulia[i].name + " is empty!"}, "#FFA600");
+                yield return new WaitForSeconds(0.5f);
+                inputFieldsJulia[i].text = previousValuesJulia[i];
+                error = true;
             }
             if (double.TryParse(inputFieldsJulia[i].text, out result)){
                 inputFieldsJulia[i].text = result.ToString(format);
                 continue;
             }else{
-                LogsController.UpdateLogs(new String[] {"Error parsing Julia " + inputFieldsJulia[i].name + ". Cannot parse '" + inputFieldsJulia[i].text + "' to double."}, "#FFA600");
+                LogsController.UpdateLogs(new string[] {"Error parsing " + inputFieldsJulia[i].name + ". Cannot parse '" + inputFieldsJulia[i].text + "' to double."}, "#FFA600");
                 yield return new WaitForSeconds(0.5f);
                 inputFieldsJulia[i].text = previousValuesJulia[i];
                 error = true;
@@ -391,6 +398,12 @@ public class InterfaceController : MonoBehaviour
         for (int i = 0; i < 3; i++){
             if (!string.Equals(inputFields[i].text, previousValues[i])){
                 changed = true;
+            }
+            if (inputFields[i].text.Length == 0){
+                LogsController.UpdateLogs(new string[] {inputFields[i].name + " is empty!"}, "#FFA600");
+                yield return new WaitForSeconds(0.5f);
+                inputFields[i].text = previousValues[i];
+                error = true;
             }
             if (double.TryParse(inputFields[i].text, out result)){
                 inputFields[i].text = result.ToString(format);

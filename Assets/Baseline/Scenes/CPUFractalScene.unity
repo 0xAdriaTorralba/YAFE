@@ -1881,8 +1881,8 @@ MonoBehaviour:
     finished: 0
   fp:
     maxIters: 100
-    algorithm: 
-    colorMap: 
+    algorithm: Escape Algorithm
+    colorMap: Colormap 1
   reZ: 0
   imZ: 0
 --- !u!114 &209585140
@@ -1910,7 +1910,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8392157, g: 0.8392157, b: 0.8392157, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2083,7 +2083,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4009,7 +4009,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &401806144
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5089,7 +5089,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &530696119
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6034,7 +6034,7 @@ GameObject:
   - component: {fileID: 633688106}
   m_Layer: 5
   m_Name: Colormap Dropdown
-  m_TagString: Untagged
+  m_TagString: DropdownColormap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6111,7 +6111,7 @@ MonoBehaviour:
     m_Options:
     - m_Text: Colormap 1
       m_Image: {fileID: 0}
-    - m_Text: Colormap 2
+    - m_Text: Black and White
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6814,7 +6814,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -8101,7 +8101,7 @@ GameObject:
   - component: {fileID: 815546152}
   m_Layer: 5
   m_Name: Max Iterations Slider
-  m_TagString: Untagged
+  m_TagString: SliderMaxIters
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8174,7 +8174,7 @@ MonoBehaviour:
   m_MinValue: 10
   m_MaxValue: 1000
   m_WholeNumbers: 1
-  m_Value: 10
+  m_Value: 100
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -8759,6 +8759,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 847795001}
+  - component: {fileID: 847795002}
   m_Layer: 5
   m_Name: Preferences Area
   m_TagString: Untagged
@@ -8792,6 +8793,18 @@ RectTransform:
   m_AnchoredPosition: {x: 324.6, y: -492.5}
   m_SizeDelta: {x: 570, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &847795002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847795000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac538d921f9c54b7d9b9882031383ccd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &855828045
 GameObject:
   m_ObjectHideFlags: 0
@@ -9003,7 +9016,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &882757156
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11462,7 +11475,7 @@ GameObject:
   - component: {fileID: 1127938817}
   m_Layer: 5
   m_Name: Rendering Algorithm Dropdown
-  m_TagString: Untagged
+  m_TagString: DropdownAlgorithm
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16927,7 +16940,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8392157, g: 0.8392157, b: 0.8392157, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -16982,8 +16995,8 @@ MonoBehaviour:
     finished: 0
   fp:
     maxIters: 100
-    algorithm: 
-    colorMap: 
+    algorithm: Escape Algorithm
+    colorMap: Colormap 1
 --- !u!1 &1637812380
 GameObject:
   m_ObjectHideFlags: 0
@@ -20205,7 +20218,7 @@ GameObject:
   - component: {fileID: 1959110398}
   m_Layer: 5
   m_Name: Max Iterations Input
-  m_TagString: Untagged
+  m_TagString: InputFieldMaxIters
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -20314,7 +20327,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 
+  m_Text: 100
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0

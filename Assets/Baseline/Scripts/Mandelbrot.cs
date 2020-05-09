@@ -16,7 +16,17 @@ public class Mandelbrot : Fractal
             Debug.Log("There is no Mandelbrot drawing coroutine running.");
         }finally {
             rp.finished = false;
-            rp.drawingThread = StartCoroutine(Draw());
+            switch(fp.algorithm){
+                case "Escape Algorithm":
+                    rp.drawingThread = StartCoroutine(Draw());
+                    break;
+                case "Another Algorithm":
+                    break;
+                default:
+                    rp.drawingThread = StartCoroutine(Draw());
+                    break;
+
+            }
         }
     }
 
@@ -24,8 +34,9 @@ public class Mandelbrot : Fractal
         //Draw();
     }
 
-    protected IEnumerator Draw(){
+    protected new IEnumerator Draw(){
         LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine started."}, "#ffffffff");
+        Debug.Log(fp.colorMap);
         int x, y, i;
         rp.count = 0;
         CorrectAspectRatio();
@@ -50,7 +61,17 @@ public class Mandelbrot : Fractal
                 if (i == fp.maxIters){
                     value = new Color(0.0f, 0.0f, 0.0f, 1.0f);
                 }else{
-                    value = new Color(Mathf.Sin((float)i/4) / 4.0f + 0.75f, Mathf.Sin((float)i/5) / 4.0f + 0.75f, Mathf.Sin((float)i/7) / 4.0f + 0.75f, 1.0f);               
+                    switch (fp.colorMap){
+                        case "Colormap 1":
+                            value = new Color(Mathf.Sin((float)i/4) / 4.0f + 0.75f, Mathf.Sin((float)i/5) / 4.0f + 0.75f, Mathf.Sin((float)i/7) / 4.0f + 0.75f, 1.0f);
+                            break;
+                        case "Black and White":
+                            value = new Color(1.0f, 1.0f, 1.0f, 1.0f); 
+                            break;
+                        default:
+                            value = new Color(Mathf.Sin((float)i/4) / 4.0f + 0.75f, Mathf.Sin((float)i/5) / 4.0f + 0.75f, Mathf.Sin((float)i/7) / 4.0f + 0.75f, 1.0f);
+                            break;
+                    }
                 }
                 rp.count++;
                 rp.tex2D.SetPixel((int) x, (int) y, value);
