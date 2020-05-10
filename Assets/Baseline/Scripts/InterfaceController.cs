@@ -28,7 +28,7 @@ public class InterfaceController : MonoBehaviour
 
     private TMP_InputField realPartJulia, imaginaryPartJulia;
 
-    private const string format = "F8";
+    private const string format = "F10";
 
     private double rez, imz;
 

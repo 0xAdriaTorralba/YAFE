@@ -71,6 +71,8 @@ public class Julia : Fractal
 
     protected IEnumerator Draw(double reZ, double imZ){
         LogsController.UpdateLogs(new string[] {"Julia drawing corroutine started."}, "#ffffffff");
+        System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+        watch.Start();
         int x, y, i;
         rp.count = 0;
         CorrectAspectRatio();
@@ -111,7 +113,7 @@ public class Julia : Fractal
                 rp.tex2D.SetPixel((int) x, (int) y, value);
             }
             
-            if (x % 10 == 0){
+            if (x % 188 == 0){
                 rp.tex2D.Apply();
                 rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
                 yield return new WaitForEndOfFrame();
@@ -121,7 +123,8 @@ public class Julia : Fractal
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
-        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully!"}, "#75FF00");
+        watch.Stop();
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
 
     }
 }
