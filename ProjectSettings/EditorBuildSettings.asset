@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Baseline/Scenes/CPUFractalScene.unity
+    path: Assets/Baseline/Scenes/FractalsUIScene.unity
     guid: f232511b9b9d2433eaa470132960f7c6
   m_configObjects: {}

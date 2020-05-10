@@ -6109,7 +6109,13 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: Colormap 1
+    - m_Text: Colormap 1 (Sin)
+      m_Image: {fileID: 0}
+    - m_Text: Colormap 2 (Cos)
+      m_Image: {fileID: 0}
+    - m_Text: Colormap 3 (Tan)
+      m_Image: {fileID: 0}
+    - m_Text: Gradient
       m_Image: {fileID: 0}
     - m_Text: Black and White
       m_Image: {fileID: 0}
@@ -7326,7 +7332,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 120}
+  m_SizeDelta: {x: 360, y: 180}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &732023624
 MonoBehaviour:
@@ -7347,7 +7353,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 2512f56f1cbcf4d8a8d6814d5b8a0bb2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9ce942e8237a642568fc88b90289e6ee, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -14517,7 +14523,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -16996,7 +17002,7 @@ MonoBehaviour:
   fp:
     maxIters: 100
     algorithm: Escape Algorithm
-    colorMap: Colormap 1
+    colorMap: Colormap 1 (Sin)
 --- !u!1 &1637812380
 GameObject:
   m_ObjectHideFlags: 0
@@ -18221,7 +18227,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Colormap 1
+  m_text: Colormap 1 (Sin)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -18290,10 +18296,10 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1769571770}
-    characterCount: 10
+    characterCount: 16
     spriteCount: 0
-    spaceCount: 1
-    wordCount: 2
+    spaceCount: 2
+    wordCount: 3
     linkCount: 0
     lineCount: 1
     pageCount: 1
