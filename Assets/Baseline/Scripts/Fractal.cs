@@ -23,8 +23,15 @@ public class RenderingParameters{
 [System.Serializable]
 public class FractalParameters{
     public int maxIters = 100;
+
+    public int threshold = 2;
+
+    public int degree = 2;
     public string algorithm;
     public string colorMap;
+
+    public string family = "Polynomic";
+
 }
 
 public abstract class Fractal : MonoBehaviour

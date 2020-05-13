@@ -29,7 +29,8 @@ public class Mandelbrot : Fractal
                 case "Escape Algorithm":
                     rp.drawingThread = StartCoroutine(Draw());
                     break;
-                case "Another Algorithm":
+                case "Henriksen Algorithm":
+                    rp.drawingThread = StartCoroutine(Draw());
                     break;
                 default:
                     rp.drawingThread = StartCoroutine(Draw());
@@ -65,11 +66,11 @@ public class Mandelbrot : Fractal
                 // For display purposes
                 
             }
-             if (x % 10 == 0){
+             if (x % 20 == 0){
             //     rp.tex2D.Apply();
             //     rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
             //     yield return new WaitForEndOfFrame();
-                yield return new WaitForSeconds(0.0001f);
+                yield return new WaitForSeconds(0.001f);
             }
         }
         rp.tex2D.Apply();
@@ -86,11 +87,41 @@ public class Mandelbrot : Fractal
         Complex z = new Complex(0.0f, 0.0f);
         Complex c = new Complex(rp.viewPortX, rp.viewPortY);
         int i = 0;
-        while (Complex.Abs(z) < 2 && i < fp.maxIters){
-            z = Complex.Pow(z, 2) + c;
+        while (Complex.Abs(z) < fp.threshold && i < fp.maxIters){
+            z = Complex.Pow(z, fp.degree) + c;
             i++;
         }
         return i;
+    }
+
+    private int ComputeConvergenceNewton(int x, int y){
+        rp.viewPortX = rp.xmin + ((double) x / rp.pwidth) * rp.viewPortWidth + rp.panX;
+        rp.viewPortY = rp.ymin + ((double) y / rp.pheight) * rp.viewPortHeight + rp.panY;
+        Complex z = new Complex(0.0f, 0.0f);
+        Complex c = new Complex(rp.viewPortX, rp.viewPortY);
+        int i = 0;
+        double tol = 1e-6;
+        Complex r1, r2, r3;
+        r1 = new Complex(1.0, 0.0);
+        r2 = new Complex(-0.5, 0.86603);
+        r3 = new Complex(-0.5, -0.86603);
+        while (Complex.Abs(z - r1) >= tol && Complex.Abs(z - r2) >= tol && Complex.Abs(z - r3) >= tol && i < fp.maxIters){
+            //z = Complex.Pow(z, fp.degree) + c;
+            if (Complex.Abs(z) > 0){
+                z = z - ((Complex.Pow(z, 3) - 1) / (Complex.Pow(z, 2) * 3.0));
+            }
+            i++;
+        }
+        if (Complex.Abs(z - r1) < tol){
+            return 20;
+        }
+        if (Complex.Abs(z - r2) < tol){
+            return 40;
+        }
+        if (Complex.Abs(z - r3) < tol){
+            return 60;
+        }
+        return 60;
     }
 
     private Color PickColor(int i){

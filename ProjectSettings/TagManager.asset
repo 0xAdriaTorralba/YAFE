@@ -18,6 +18,11 @@ TagManager:
   - DropdownColormap
   - SliderMaxIters
   - InputFieldMaxIters
+  - DropdownFamily
+  - SliderThreshold
+  - InputFieldThreshold
+  - InputFieldDegree
+  - SliderDegree
   layers:
   - Default
   - TransparentFX
