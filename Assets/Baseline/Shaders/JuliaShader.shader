@@ -1,11 +1,15 @@
-﻿Shader "Custom/JuliaShader"
+﻿Shader "FractalShaders/JuliaShader"
 {
     Properties
     {
         _Seed("Seed", Vector) = (0.5, 0.5, 0.5, 0.5)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _Aspect("Aspect Ratio", Float) = 1
-        _Iterations ("Iterations", Range(1, 2000)) = 20
+        _Zoom("Zoom", Vector) =  (1, 1, 1, 1)
+        _Pan ("Pan", Vector) = (1, 1, 1, 1)
+        _Iterations ("Iterations", Range(1, 2000)) = 100
+        _Threshold ("Threshold", Range(2, 250)) = 2
+        _Colormap ("Colormap", Int) = 1
     }
     SubShader
     {
@@ -26,9 +30,13 @@
             float2 uv_MainTex;
         };
 
+        float4 _Zoom;
+        float4 _Pan;
         int _Iterations;
         float _Aspect;
         float4 _Seed;
+        float _Threshold;
+        int _Colormap;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
         // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -44,25 +52,41 @@
 
 
             float2 c = _Seed;
-            float2 v = (IN.uv_MainTex - 0.5) * 4.0f * float2(1, _Aspect);
+            float2 v = (IN.uv_MainTex - 0.5) * _Zoom.xy * float2(1, _Aspect) - _Pan.xy;
             float m = 0;
-            const float r = 5;
+            const float r = _Threshold;
 
             for (int n = 0; n < _Iterations; ++n){
                 v = float2(v.x * v.x - v.y * v.y, v.x * v.y * 2) + c;
 
-                if (dot(v, v) < (r*r - 1)){
+                if (dot(v, v) < (r*r)){
                     m++;
                 }
                 v = clamp(v, -r, r);
             }
 
             float4 color;
-            if (m == _Iterations){
-                color = float4(0, 0, 0, 1);
-            }else{
-                color = float4(sin(m/4), sin(m/5), sin(m/7), 1) / 4 + 0.75;
+            if (_Colormap == 1){
+                if (m == _Iterations){
+                    color = float4(0, 0, 0, 1);
+                }else{
+                    color = float4(sin(m/4), sin(m/5), sin(m/7), 1) / 4 + 0.75;
+                }
             }
+            if (_Colormap == 2){
+                if (m == _Iterations){
+                    color = float4(0, 0, 0, 1);
+                }else{
+                    color = float4(cos(m/4), cos(m/5), cos(m/7), 1) / 4 + 0.75;
+                }
+            }     
+            if (_Colormap == 3){
+                if (m == _Iterations){
+                    color = float4(0, 0, 0, 1);
+                }else{
+                    color = float4(tan(m/4), tan(m/5), tan(m/7), 1) / 4 + 0.75;
+                }
+            }       
 
             o.Albedo = color;
             //o.Emission = color;

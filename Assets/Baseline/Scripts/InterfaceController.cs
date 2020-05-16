@@ -14,7 +14,6 @@ public class InterfaceController : MonoBehaviour
 
     private Mandelbrot fractalMandelbrot;
     private Julia fractalJulia;
-    private ProgressBarController progressBarControllerMandelbrot, progressBarControllerJulia;
 
     private CoordinatesListener clMandelbrot, clJulia;
     private GameObject eventSystem;
@@ -51,9 +50,6 @@ public class InterfaceController : MonoBehaviour
         fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<Mandelbrot>();
         fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<Julia>();
 
-
-        progressBarControllerJulia = GameObject.Find("Progress Bar Julia").GetComponent<ProgressBarController>();
-        progressBarControllerMandelbrot = GameObject.Find("Progress Bar Mandelbrot").GetComponent<ProgressBarController>();
 
 
         clMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<CoordinatesListener>();
@@ -245,7 +241,7 @@ public class InterfaceController : MonoBehaviour
     public void RefreshFractalMandelbrot(){
         UpdateMandelbrotRenderingValues();
         fractalMandelbrot.StartDraw();
-        progressBarControllerMandelbrot.StartProgressBarMandelbrot();
+        //progressBarControllerMandelbrot.StartProgressBarMandelbrot();
     }
 
     private void ZoomInJulia(double defaultZoom){
@@ -319,13 +315,13 @@ public class InterfaceController : MonoBehaviour
     public void RefreshFractalJulia(){
         UpdateJuliaRenderingValues();
         fractalJulia.RedrawCurrent();
-        progressBarControllerJulia.StartProgressBarJulia();
+        //progressBarControllerJulia.StartProgressBarJulia();
     }
 
     private void RefreshFractalJulia(double rez, double imz){
         UpdateJuliaRenderingValues();
         fractalJulia.StartDraw(rez, imz);
-        progressBarControllerJulia.StartProgressBarJulia();
+        //progressBarControllerJulia.StartProgressBarJulia();
     }
 
     private void ZoomInFractal(Fractal fractal, double rez, double imz){
@@ -338,13 +334,11 @@ public class InterfaceController : MonoBehaviour
             inputFields[1].text = fractal.rp.panX.ToString(format);
             inputFields[2].text = fractal.rp.panY.ToString(format);
             fractal.StartDraw();
-            progressBarControllerMandelbrot.StartProgressBarMandelbrot();
         }else{
             inputFields[3].text = fractal.rp.xmax.ToString(format);
             inputFields[4].text = fractal.rp.panX.ToString(format);
             inputFields[5].text = fractal.rp.panY.ToString(format);
             ((Julia) fractal).RedrawCurrent();
-            progressBarControllerJulia.StartProgressBarJulia();
         }
     }
 
@@ -358,13 +352,11 @@ public class InterfaceController : MonoBehaviour
             inputFields[1].text = fractal.rp.panX.ToString(format);
             inputFields[2].text = fractal.rp.panY.ToString(format);
             fractal.StartDraw();
-            progressBarControllerMandelbrot.StartProgressBarMandelbrot();
         }else{
             inputFields[3].text = fractal.rp.xmax.ToString(format);
             inputFields[4].text = fractal.rp.panX.ToString(format);
             inputFields[5].text = fractal.rp.panY.ToString(format);
             ((Julia) fractal).RedrawCurrent();
-            progressBarControllerJulia.StartProgressBarJulia();
         }
     }
 
@@ -376,7 +368,6 @@ public class InterfaceController : MonoBehaviour
             fractalJulia.StartDraw(rezM, imzM);
             realPartJulia.text = rezM + "";
             imaginaryPartJulia.text = imzM + "";
-            progressBarControllerJulia.StartProgressBarJulia();
         }
 
         if(Input.GetMouseButtonDown(1) && clMandelbrot.getIsPointerIn()){

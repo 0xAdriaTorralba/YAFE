@@ -19,6 +19,7 @@ public class RenderingParameters{
     public int count;
     public bool finished;
     public Coroutine drawingThread;
+    public bool parallel = true;
 }
 [System.Serializable]
 public class FractalParameters{
@@ -30,21 +31,35 @@ public class FractalParameters{
     public string algorithm;
     public string colorMap;
 
-    public string family = "Polynomic";
+    public string family = "Polynomial";
 
 }
 
 public abstract class Fractal : MonoBehaviour
 {
 
+    public class ColorData{
+        public Color color;
+        public int x;
+        public int y;
+
+        public ColorData(Color color, int x, int y){
+            this.color = color;
+            this.x = x;
+            this.y = y;
+     }
+    }
+
     public RenderingParameters rp;
     public FractalParameters fp;
 
 
+
+
     void Awake(){
         
-        rp.fractalImage = GetComponent<Image>();
-        rp.tex2D = new Texture2D((int) rp.pwidth, (int) rp.pheight);
+        
+
     }
 
     void Start(){

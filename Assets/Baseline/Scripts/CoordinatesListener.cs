@@ -8,7 +8,7 @@ public class CoordinatesListener : MonoBehaviour, IPointerEnterHandler, IPointer
 {
     private double x, y;
 
-    public bool isPointerIn = false;
+    private bool isPointerIn = false;
 
     private Coroutine coroutine;
 
@@ -32,9 +32,9 @@ public class CoordinatesListener : MonoBehaviour, IPointerEnterHandler, IPointer
 
     private IEnumerator UpdatePosition(PointerEventData eventData){
         while(isPointerIn){
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(_screenRectTransform, eventData.position, null, out Vector2 localClick); 
-            x = (double)localClick.x + (_screenRectTransform.rect.width / 2.0);
-            y = (double)localClick.y + (_screenRectTransform.rect.height / 2.0);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_screenRectTransform, eventData.position, Camera.main, out Vector2 localClick); 
+            x = (int)(localClick.x + (_screenRectTransform.rect.width / 2.0));
+            y = (int)(localClick.y + (_screenRectTransform.rect.height / 2.0));
             yield return null;
         }
     }

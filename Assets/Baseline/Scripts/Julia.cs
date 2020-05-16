@@ -3,12 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Numerics;
 using System;
+using UnityEngine.UI;
+using System.Threading.Tasks;
+using TMPro;
 
 
 public class Julia : Fractal
 {
+    private static object lockObject = new object();
 
     private Color[] colors;
+
+    public GameObject GOprogressBar;
+    public GameObject GOpercentage;
+
+    private Image progressBar;
+    private TextMeshProUGUI percentage;
+
+
+    void Awake(){
+        rp.fractalImage = GetComponent<Image>();
+        rp.tex2D = new Texture2D((int) rp.pwidth, (int) rp.pheight);
+        progressBar = GOprogressBar.transform.GetComponent<Image>();
+        percentage = GOpercentage.transform.GetComponent<TextMeshProUGUI>();
+    }
+
     void Start(){
         colors = new Color[256];
         for(int i = 0; i < 255; i++){
@@ -59,18 +78,32 @@ public class Julia : Fractal
             Debug.Log("There is no Julia drawing coroutine running.");
         }finally {
             rp.finished = false;
-            switch(fp.algorithm){
-                case "Escape Algorithm":
-                    rp.drawingThread = StartCoroutine(Draw(reZ, imZ));
-                    break;
-                case "Henriksen Algorithm":
-                    rp.drawingThread = StartCoroutine(DrawHenriksen(reZ, imZ));
+            if (!rp.parallel){
+                switch(fp.algorithm){
+                    case "Escape Algorithm":
+                        rp.drawingThread = StartCoroutine(Draw(reZ, imZ));
+                        break;
+                    case "Henriksen Algorithm":
+                        rp.drawingThread = StartCoroutine(DrawHenriksen(reZ, imZ));
+                        break;
+                    default:
+                        rp.drawingThread = StartCoroutine(Draw(reZ, imZ));
+                        break;
 
-                    break;
-                default:
-                    rp.drawingThread = StartCoroutine(Draw(reZ, imZ));
-                    break;
+                }
+            }else{
+                switch(fp.algorithm){   
+                    case "Escape Algorithm":
+                        rp.drawingThread = StartCoroutine(DrawParallelized(reZ, imZ));
+                        break;
+                    case "Henriksen Algorithm":
+                        rp.drawingThread = StartCoroutine(DrawHenriksenParallelized(reZ, imZ));
+                        break;
+                    default:
+                        rp.drawingThread = StartCoroutine(DrawParallelized(reZ, imZ));
+                        break;
 
+                }
             }
         }
     }
@@ -79,11 +112,16 @@ public class Julia : Fractal
         //Draw(reZ, imZ);
     }
 
-    protected IEnumerator DrawHenriksen(double reZ, double imZ){
+    private void UpdateProgress(){
+        progressBar.fillAmount = GetProgress();
+        percentage.text = (int)(GetProgress()*100) + "";
+    }
+
+    protected IEnumerator DrawHenriksenParallelized(double reZ, double imZ){
         LogsController.UpdateLogs(new string[] {"Julia drawing corroutine started."}, "#ffffffff");
         System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
         watch.Start();
-        int x, y, i;
+        int i;
         rp.count = 0;
         CorrectAspectRatio();
         rp.xmin = - rp.xmax;
@@ -91,26 +129,71 @@ public class Julia : Fractal
         rp.tex2D = new Texture2D((int) rp.pwidth, (int) rp.pheight);
         rp.viewPortWidth = rp.xmax - rp.xmin;
         rp.viewPortHeight = rp.ymax - rp.ymin;
-        for (x = 0; x < rp.pwidth; x++){
-            for (y = 0; y < rp.pheight; y++){
+        ArrayList res = new ArrayList();
+        ArrayList results = ArrayList.Synchronized( res );
+        Task task = Task.Factory.StartNew(delegate {
+        Parallel.For(0, rp.pwidth, (int x) => {
+            
+            Parallel.For(0, rp.pheight, (int y) => {
                 Color value;
                 i = ComputeConvergenceHenriksen(x, y, reZ, imZ);
                 value = PickColor(i);
-                
-                rp.count++;
-                rp.tex2D.SetPixel((int) x, (int) y, value);
-                
-                
+                results.Add(new ColorData(value, x, y));
+                lock(lockObject){
+                    rp.count++;
                 }
-                // For display purposes
-                if (x % 20 == 0){
-                    // rp.tex2D.Apply();
-                    // rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
-                    // yield return new WaitForEndOfFrame();
-                    yield return new WaitForSeconds(0.001f);
-            }
+                
+                
+            });
+            
+        } );} );
+        while (!task.IsCompleted){
+            UpdateProgress();
+            yield return new WaitForSeconds(0.1f);
         }
+        UpdateProgress();
+        foreach(ColorData c in results){
+            rp.tex2D.SetPixel(c.x, c.y, c.color);
+        }
+        rp.tex2D.Apply();
+        rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
+        yield return new WaitForSeconds(0.5f);
+        rp.finished = true;
+        watch.Stop();
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
         
+    }
+
+    protected IEnumerator DrawHenriksen(double reZ, double imZ){
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine started."}, "#ffffffff");
+        System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+        watch.Start();
+        int i;
+        rp.count = 0;
+        CorrectAspectRatio();
+        rp.xmin = - rp.xmax;
+        rp.ymin = - rp.ymax;
+        rp.tex2D = new Texture2D((int) rp.pwidth, (int) rp.pheight);
+        rp.viewPortWidth = rp.xmax - rp.xmin;
+        rp.viewPortHeight = rp.ymax - rp.ymin;
+        ArrayList res = new ArrayList();
+        for(int x = 0; x < rp.pwidth; x++){
+            for (int y = 0; y < rp.pheight; y++){
+                Color value;
+                i = ComputeConvergenceHenriksen(x, y, reZ, imZ);
+                value = PickColor(i);
+                rp.tex2D.SetPixel(x, y, value);
+                rp.count++;
+                
+            }
+            // For display purposes
+            if (x % 10 == 0){
+                UpdateProgress();
+                yield return new WaitForSeconds(0.001f);
+            }
+            
+        }
+        UpdateProgress();
         rp.tex2D.Apply();
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
         yield return new WaitForSeconds(0.5f);
@@ -137,6 +220,54 @@ public class Julia : Fractal
         } 
     }
 
+    protected IEnumerator DrawParallelized(double reZ, double imZ){
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine started."}, "#ffffffff");
+        System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+        watch.Start();
+        int i;
+        rp.count = 0;
+        CorrectAspectRatio();
+        rp.xmin = - rp.xmax;
+        rp.ymin = - rp.ymax;
+        rp.tex2D = new Texture2D((int) rp.pwidth, (int) rp.pheight);
+        rp.viewPortWidth = rp.xmax - rp.xmin;
+        rp.viewPortHeight = rp.ymax - rp.ymin;
+        ArrayList res = new ArrayList();
+        ArrayList results = ArrayList.Synchronized( res );
+        Task task = Task.Factory.StartNew(delegate {
+        Parallel.For(0, rp.pwidth, (int x) => {
+            
+            Parallel.For(0, rp.pheight, (int y) => {
+                Color value;
+                i = ComputeConvergence(x, y, reZ, imZ);
+                value = PickColor(i);
+                
+                results.Add(new ColorData(value, x, y));
+                lock (lockObject){
+                    rp.count++;
+                } 
+                
+                
+            });
+            
+        } );} );
+        while (!task.IsCompleted){
+            UpdateProgress();
+            yield return new WaitForSeconds(0.1f);
+        }
+        UpdateProgress();
+        foreach(ColorData c in results){
+            rp.tex2D.SetPixel(c.x, c.y, c.color);
+        }
+        rp.tex2D.Apply();
+        rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
+        yield return new WaitForSeconds(0.5f);
+        rp.finished = true;
+        watch.Stop();
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
+        
+    }
+
     protected IEnumerator Draw(double reZ, double imZ){
         LogsController.UpdateLogs(new string[] {"Julia drawing corroutine started."}, "#ffffffff");
         System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
@@ -161,13 +292,11 @@ public class Julia : Fractal
                 }
                 // For display purposes
                 if (x % 10 == 0){
-                    // rp.tex2D.Apply();
-                    // rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
-                    // yield return new WaitForEndOfFrame();
-                    yield return new WaitForSeconds(0.0001f);
-            }
+                    UpdateProgress();
+                    yield return new WaitForSeconds(0.001f);
+                }
         }
-        
+        UpdateProgress();
         rp.tex2D.Apply();
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
         yield return new WaitForSeconds(0.5f);
@@ -179,20 +308,35 @@ public class Julia : Fractal
 
     public void CalculateImageAndDrawImage(double reZ, double imZ, int x, int y){
         int cImageReZ, cImageImZ;
-        Complex c = new Complex(reZ, imZ);
-        
-        Complex z = Complex.Pow(c, fp.degree) + new Complex(this.reZ, this.imZ);
-        cImageReZ = (int)((z.Real - rp.panX - rp.xmin) * (rp.pwidth / rp.viewPortWidth));
-        cImageImZ = (int)((z.Imaginary - rp.panY - rp.ymin) * (rp.pheight / rp.viewPortHeight));
-        DrawLine(rp.tex2D, new UnityEngine.Vector2 (x, y), new UnityEngine.Vector2 (cImageReZ, cImageImZ), Color.white);
-        // z = Complex.Sqrt(c - new Complex(this.reZ, this.imZ));
-        // cImageReZ = (int)((z.Real - rp.panX - rp.xmin) * (rp.pwidth / rp.viewPortWidth));
-        // cImageImZ = (int)((z.Imaginary - rp.panY - rp.ymin) * (rp.pheight / rp.viewPortHeight));
-        // DrawLine(rp.tex2D, new UnityEngine.Vector2 (x, y), new UnityEngine.Vector2 (cImageReZ, cImageImZ), Color.red);
-        // cImageReZ = (int)((-z.Real - rp.panX - rp.xmin) * (rp.pwidth / rp.viewPortWidth));
-        // cImageImZ = (int)((-z.Imaginary - rp.panY - rp.ymin) * (rp.pheight / rp.viewPortHeight));
-        // DrawLine(rp.tex2D, new UnityEngine.Vector2 (x, y), new UnityEngine.Vector2 (cImageReZ, cImageImZ), Color.green);
+        Complex originalPoint = new Complex(reZ, imZ);
+        int oldX = x, oldY = y;
+        Complex z = originalPoint;
+        int i = 0;
+        double tol = (rp.xmax - rp.xmin) / 2.0;
+        bool escape = false;
+        do{
+            z = Complex.Pow(z, fp.degree) + new Complex(this.reZ, this.imZ);
+            cImageReZ = (int)((z.Real - rp.panX - rp.xmin) * (rp.pwidth / rp.viewPortWidth));
+            cImageImZ = (int)((z.Imaginary - rp.panY - rp.ymin) * (rp.pheight / rp.viewPortHeight));
+            DrawLine(rp.tex2D, new UnityEngine.Vector2 (oldX, oldY), new UnityEngine.Vector2 (cImageReZ, cImageImZ), Color.white);
+            i++;
+            oldX = cImageReZ;
+            oldY = cImageImZ;
+            if (Complex.Abs(z) > fp.threshold){
+                escape = true;
+                break;
+            }
+        }while(i < fp.maxIters && Complex.Abs(originalPoint - z) > tol);
+        if (!escape){
+            if (Complex.Abs(originalPoint - z) > tol){
+                LogsController.UpdateLogs(new string[] {"We cannot calculate the periodic orbit for the point ("+originalPoint.Real + ", "+originalPoint.Imaginary+")."}, "#FFFFFF");
+            }else{
+                LogsController.UpdateLogs(new string[] {"The point ("+originalPoint.Real + ", "+originalPoint.Imaginary+") belongs to a periodic orbit of periode " + i+ "."}, "#FFFFFF");
+            }
+        }else{
+            LogsController.UpdateLogs(new string[] {"The point ("+originalPoint.Real + ", "+originalPoint.Imaginary+" does not converge!"}, "#FFFFFF");
 
+        }
         rp.tex2D.Apply();
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
     }

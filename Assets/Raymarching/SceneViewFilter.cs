@@ -15,7 +15,7 @@ public class SceneViewFilter : MonoBehaviour
 
     static SceneViewFilter()
     {
-        SceneView.onSceneGUIDelegate += CheckMe;
+        //SceneView.onSceneGUIDelegate += CheckMe;
     }
 
     static void CheckMe(SceneView sv)

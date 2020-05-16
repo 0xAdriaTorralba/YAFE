@@ -23,6 +23,10 @@ TagManager:
   - InputFieldThreshold
   - InputFieldDegree
   - SliderDegree
+  - ProgressBarMandelbrot
+  - ProgressBarJulia
+  - PercentageJulia
+  - PercentageMandelbrot
   layers:
   - Default
   - TransparentFX
