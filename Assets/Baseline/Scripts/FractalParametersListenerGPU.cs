@@ -52,28 +52,28 @@ public class FractalParametersListenerGPU : MonoBehaviour
     }
 
     public void OnSliderEnd(){
-        interfaceController.RefreshFractalMandelbrot();
-        interfaceController.RefreshFractalJulia();
+        // interfaceController.RefreshFractalMandelbrot();
+        // interfaceController.RefreshFractalJulia();
     }
 
     private void DropdownValueChanged(TMP_Dropdown dropdown){
         if (string.Equals(dropdown.tag, "DropdownAlgorithm")){
-            fractalMandelbrot.fp.algorithm = dropdown.captionText.text.ToString();
-            fractalJulia.fp.algorithm = dropdown.captionText.text.ToString();
-            interfaceController.RefreshFractalMandelbrot();
-            interfaceController.RefreshFractalJulia();
+            fractalMandelbrot.UpdateAlgorithm(dropdown.captionText.text.ToString());
+            fractalJulia.UpdateAlgorithm(dropdown.captionText.text.ToString());
+            // interfaceController.RefreshFractalMandelbrot();
+            // interfaceController.RefreshFractalJulia();
         }
         if (string.Equals(dropdown.tag, "DropdownColormap")){
             fractalMandelbrot.UpdateColormap(dropdown.captionText.text.ToString());
             fractalJulia.UpdateColormap(dropdown.captionText.text.ToString());
-            interfaceController.RefreshFractalMandelbrot();
-            interfaceController.RefreshFractalJulia();
+            // interfaceController.RefreshFractalMandelbrot();
+            // interfaceController.RefreshFractalJulia();
         }
         if (string.Equals(dropdown.tag, "DropdownFamily")){
             fractalMandelbrot.fp.family = dropdown.captionText.text.ToString();
             fractalJulia.fp.family = dropdown.captionText.text.ToString();
-            interfaceController.RefreshFractalMandelbrot();
-            interfaceController.RefreshFractalJulia();
+            // interfaceController.RefreshFractalMandelbrot();
+            // interfaceController.RefreshFractalJulia();
         }
     }
 
@@ -89,8 +89,8 @@ public class FractalParametersListenerGPU : MonoBehaviour
             inputFieldThreshold.text = slider.value + "";
         }
         if (string.Equals(slider.tag, "SliderDegree")){
-            fractalMandelbrot.fp.degree = (int) slider.value;
-            fractalJulia.fp.degree = (int) slider.value;
+            fractalMandelbrot.UpdateDegree((int) slider.value);
+            fractalJulia.UpdateDegree((int) slider.value);
             inputFieldDegree.text = slider.value + "";
         }
     }
@@ -112,7 +112,7 @@ public class FractalParametersListenerGPU : MonoBehaviour
         }
 
         if (allowEnterDegree && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))){
-            StartCoroutine(OnSubmit(inputFieldDegree, previousDegree, 2, 10));
+            StartCoroutine(OnSubmit(inputFieldDegree, previousDegree, 2, 6));
             allowEnterDegree = false;
         }else{
             allowEnterDegree = inputFieldDegree.isFocused;
@@ -137,12 +137,20 @@ public class FractalParametersListenerGPU : MonoBehaviour
         if (int.TryParse(inputField.text, out result)){
             if (result >= min && result <= max){
                 if (string.Equals(inputField.tag, "InputFieldMaxIters")){
-                    fractalMandelbrot.fp.maxIters = fractalJulia.fp.maxIters = result;
+                    fractalMandelbrot.UpdateIterations(result);
+                    fractalJulia.UpdateIterations(result);
                     sliderMaxIters.value = result;
                     previousMaxIters = result;
                 }
                 if (string.Equals(inputField.tag, "InputFieldThreshold")){
-                    fractalMandelbrot.fp.threshold = fractalJulia.fp.threshold = result;
+                    fractalMandelbrot.UpdateThreshold(result);
+                    fractalJulia.UpdateThreshold(result);
+                    sliderThreshold.value = result;
+                    previousValue = result;
+                }
+                if (string.Equals(inputField.tag, "InputFieldDegree")){
+                    fractalMandelbrot.UpdateDegree(result);
+                    fractalJulia.UpdateDegree(result);
                     sliderThreshold.value = result;
                     previousValue = result;
                 }
@@ -157,11 +165,6 @@ public class FractalParametersListenerGPU : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             inputField.text = previousValue.ToString("D");
             error = true;
-        }
-
-        if (!error && changed){
-            interfaceController.RefreshFractalMandelbrot();
-            interfaceController.RefreshFractalJulia();
         }
     }
 

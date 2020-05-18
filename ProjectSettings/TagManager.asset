@@ -27,6 +27,8 @@ TagManager:
   - ProgressBarJulia
   - PercentageJulia
   - PercentageMandelbrot
+  - ParallelToggle
+  - SmoothToggle
   layers:
   - Default
   - TransparentFX

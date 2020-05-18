@@ -18,12 +18,14 @@ public class InterfaceControllerGPU : MonoBehaviour
     private CoordinatesListener clMandelbrot, clJulia;
     private GameObject eventSystem;
 
-
+    private CameraMovementController cameraMandelbrot, cameraJulia;
 
     private TMP_InputField textZoomM, textPanXM, textPanYM;
     private TMP_InputField textZoomJ, textPanXJ, textPanYJ;
 
     private TMP_InputField realPartJulia, imaginaryPartJulia;
+    
+    private Toggle smoothToggle;
 
     private Button refreshMandelbrot, refreshJulia;
 
@@ -49,6 +51,9 @@ public class InterfaceControllerGPU : MonoBehaviour
         fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<MandelbrotGPU>();
         fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<JuliaGPU>();
 
+        cameraMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<CameraMovementController>();
+        cameraJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<CameraMovementController>();
+
 
         clMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<CoordinatesListener>();
         clJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<CoordinatesListener>();
@@ -64,6 +69,8 @@ public class InterfaceControllerGPU : MonoBehaviour
 
         realPartJulia = GameObject.Find("Complex Number Julia/Input Real Julia").GetComponent<TMP_InputField>();
         imaginaryPartJulia = GameObject.Find("Complex Number Julia/Input Imaginary Julia").GetComponent<TMP_InputField>();
+
+        smoothToggle = GameObject.FindGameObjectWithTag("SmoothToggle").GetComponent<Toggle>();
 
         refreshMandelbrot = GameObject.Find("Utilities Mandelbrot/Refresh").GetComponent<Button>();
         refreshJulia = GameObject.Find("Utilities Julia/Refresh").GetComponent<Button>();
@@ -115,8 +122,9 @@ public class InterfaceControllerGPU : MonoBehaviour
         previousValuesJulia.Add("0.0");
         previousValuesJulia.Add("0.0");
 
-        refreshMandelbrot.onClick.AddListener(() => RefreshFractalMandelbrot());
-        refreshJulia.onClick.AddListener(() => RefreshFractalJulia());
+        refreshMandelbrot.onClick.AddListener(() => RestartFractalMandelbrot());
+        refreshJulia.onClick.AddListener(() => RestartFractalJulia());
+        smoothToggle.onValueChanged.AddListener((value) => OnValueChangedToggle(value));
         
         allowEnter = false;
         allowEnterJulia = false;
@@ -130,35 +138,42 @@ public class InterfaceControllerGPU : MonoBehaviour
         StartCoroutine(ListenerFractal(fractalJulia, clJulia, juliaNumber));
     }
 
+    private void OnValueChangedToggle(bool value){
+        cameraMandelbrot.ToggleSmoothMovement();
+        cameraJulia.ToggleSmoothMovement();
+    }
 
 
-    public void RefreshFractalMandelbrot(){
-        fractalMandelbrot.rp.xmax = 2.0;
-        fractalMandelbrot.rp.ymax = 2.0;
-        fractalMandelbrot.rp.panX = 0.5;
-        fractalMandelbrot.rp.panY = 0.0;
-        CameraMovementController.ResetValues();
+    public void RestartFractalMandelbrot(){
+        cameraMandelbrot.SetZoom(2.0f);
+        cameraMandelbrot.SetPosition(0.0f, 0.0f);
 
     }
 
    
 
-    public void RefreshFractalJulia(){
-        fractalJulia.rp.xmax = 2.0;
-        fractalJulia.rp.ymax = 2.0;
-        fractalJulia.rp.panX = 0.0;
-        fractalJulia.rp.panY = 0.0;
+    public void RestartFractalJulia(){
+        cameraJulia.SetZoom(2.0f);
+        cameraJulia.SetPosition(0.0f, 0.0f);
     }
 
     private void RefreshFractalJulia(double rez, double imz){
         UpdateJuliaRenderingValues();
-        //progressBarControllerJulia.StartProgressBarJulia();
+        fractalJulia.UpdateSeed((float)rez, (float) imz);
     }
 
 
     // Update is called once per frame
     void Update()
     {
+        if (clMandelbrot.getIsPointerIn() && Input.GetKey(KeyCode.R)){
+            RestartFractalMandelbrot();
+        }
+
+        if (clJulia.getIsPointerIn() && Input.GetKey(KeyCode.R)){
+            RestartFractalJulia();
+        }
+
         if(Input.GetMouseButtonDown(0) && clMandelbrot.getIsPointerIn()){
             fractalJulia.UpdateSeed((float)rezM, (float)imzM);
             realPartJulia.text = rezM + "";
@@ -186,13 +201,25 @@ public class InterfaceControllerGPU : MonoBehaviour
             allowEnterJulia = realPartJulia.isFocused || imaginaryPartJulia.isFocused;
         }
 
-        textPanXM.text = fractalMandelbrot.rp.panX.ToString(format);
-        textPanYM.text = fractalMandelbrot.rp.panY.ToString(format);
-        textZoomM.text = fractalMandelbrot.rp.xmax.ToString(format);
+        if (!textPanXM.isFocused){
+            textPanXM.text = fractalMandelbrot.rp.panX.ToString(format);
+        }
+        if (!textPanYM.isFocused){
+            textPanYM.text = fractalMandelbrot.rp.panY.ToString(format);
+        }
+        if (!textZoomM.isFocused){
+            textZoomM.text = fractalMandelbrot.rp.xmax.ToString(format);
+        }
 
-        textPanXJ.text = fractalJulia.rp.panX.ToString(format);
-        textPanYJ.text = fractalJulia.rp.panY.ToString(format);
-        textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
+        if (!textPanXJ.isFocused){
+            textPanXJ.text = fractalJulia.rp.panX.ToString(format);
+        }
+        if (!textPanYJ.isFocused){
+            textPanYJ.text = fractalJulia.rp.panY.ToString(format);
+        }
+        if (!textZoomJ.isFocused){
+            textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
+        }
 
         
     }
@@ -258,9 +285,8 @@ public class InterfaceControllerGPU : MonoBehaviour
                 error = true;
             }
         }
-        UpdateMandelbrotRenderingValues();
         if (!error && changed){
-            RefreshFractalMandelbrot();
+            UpdateMandelbrotRenderingValues();
         }
 
         yield return new WaitForEndOfFrame();
@@ -280,9 +306,8 @@ public class InterfaceControllerGPU : MonoBehaviour
                 error = true;
             }
         }
-        UpdateJuliaRenderingValues();
         if (!error && changed){
-            RefreshFractalJulia();
+            UpdateJuliaRenderingValues();
         }
 
         for (int i = 0; i < 6; i++){
@@ -294,30 +319,32 @@ public class InterfaceControllerGPU : MonoBehaviour
 
     private void UpdateMandelbrotRenderingValues(){
         fractalMandelbrot.UpdateZoom((float)Double.Parse(inputFields[0].text));
+        cameraMandelbrot.SetZoom((float)Double.Parse(inputFields[0].text));
         fractalMandelbrot.UpdatePosition((float)Double.Parse(inputFields[1].text), (float)Double.Parse(inputFields[2].text));
+        cameraMandelbrot.SetPosition((float)Double.Parse(inputFields[1].text), (float)Double.Parse(inputFields[2].text));
 
     }
 
     private void UpdateJuliaRenderingValues(){
-        fractalJulia.rp.xmax = Double.Parse(inputFields[3].text);
-        fractalJulia.rp.ymax = Double.Parse(inputFields[3].text);
-        fractalJulia.rp.panX = Double.Parse(inputFields[4].text);
-        fractalJulia.rp.panY = Double.Parse(inputFields[5].text);
+        fractalJulia.UpdateZoom((float)Double.Parse(inputFields[3].text));
+        cameraJulia.SetZoom((float)Double.Parse(inputFields[3].text));
+        fractalJulia.UpdatePosition((float)Double.Parse(inputFields[4].text), (float)Double.Parse(inputFields[5].text));
+        cameraJulia.SetPosition((float)Double.Parse(inputFields[4].text), (float)Double.Parse(inputFields[5].text));
     }
 
-    IEnumerator ListenerFractal(Fractal fractal, CoordinatesListener coordinatesListener, TextMeshProUGUI text){
+    IEnumerator ListenerFractal(FractalGPU fractal, CoordinatesListener coordinatesListener, TextMeshProUGUI text){
         while (true){
             if (coordinatesListener.getIsPointerIn()){
                 if (fractal is MandelbrotGPU){
                     rezM = fractal.GetViewPortX(coordinatesListener.getX());
                     imzM = fractal.GetViewPortY(coordinatesListener.getY());
-                    if (imzM < 0) text.text = "c = "+ rezM + " - i "+ Math.Abs(imzM);
-                    else text.text = "c = "+ rezM + " + i "+ imzM;
+                    if (imzM < 0) text.text = "c = "+ rezM.ToString(format) + " - i "+ Math.Abs(imzM).ToString(format);
+                    else text.text = "c = "+ rezM.ToString(format) + " + i "+ imzM.ToString(format);
                 }else if (fractal is JuliaGPU){
                     rezJ = fractal.GetViewPortX(coordinatesListener.getX());
                     imzJ = fractal.GetViewPortY(coordinatesListener.getY());
-                    if (imzJ < 0) text.text = "z = "+ rezJ + " - i "+ Math.Abs(imzJ);
-                    else text.text = "z = "+ rezJ + " + i "+ imzJ;
+                    if (imzJ < 0) text.text = "z = "+ rezJ.ToString(format) + " - i "+ Math.Abs(imzJ).ToString(format);
+                    else text.text = "z = "+ rezJ.ToString(format) + " + i "+ imzJ.ToString(format);
                 }
                 
             }

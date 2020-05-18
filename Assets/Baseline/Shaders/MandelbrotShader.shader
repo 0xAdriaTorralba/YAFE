@@ -9,6 +9,8 @@
         _Iterations ("Iterations", Range(1, 200000)) = 200
         _Threshold ("Threshold", Range(2, 250)) = 2
         _Colormap ("Colormap", Int) = 1
+        _Algorithm ("Algorithm", Int) = 1
+        _Degree ("Degree", Int) = 2
     }
     SubShader
     {
@@ -36,6 +38,7 @@
         float _Aspect;
         float _Threshold;
         int _Colormap;
+        int _Degree;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
         // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -58,13 +61,46 @@
 
             for (int n = 0; n < _Iterations; ++n){
                 // z_n = z_(n-1)^2 + c;
-                v = float2(v.x * v.x - v.y * v.y, v.x * v.y * 2) + c;
+                if (_Degree == 2){
+                    v = float2(
+                        v.x * v.x - v.y * v.y, 
+                        v.x * v.y * 2)
+                    + c;
+                }
+                if (_Degree == 3){
+                    v = float2(
+                        v.x * v.x * v.x - 3 * v.x * v.y * v.y, 
+                        3 * v.x * v.x * v.y - v.y * v.y * v.y
+                    )
+                    + c;
+                }
+                if (_Degree == 4){
+                    v = float2(
+                        v.x * v.x * v.x * v.x - 6 * v.x * v.x * v.y * v.y + v.y * v.y * v.y * v.y, 
+                        4 * v.x * v.x * v.x * v.y - 4 * v.x * v.y * v.y * v.y
+                    )
+                    + c;
+                }
+                if (_Degree == 5){
+                    v = float2(
+                        pow(v.x, 5) - 10 * pow(v.x, 3) * pow(v.y, 2) + 5 * v.x * pow(v.y, 4),
+                        5 * pow(v.x, 4) * v.y - 10 * pow(v.x, 2) * pow(v.y, 3) + pow(v.y, 5)
+                    )
+                    + c;
+                }
+                if (_Degree == 6){
+                    v = float2(
+                        pow(v.x, 6) - 15 * pow(v.x, 4) * pow(v.y, 2) + 15 * pow(v.x, 2) * pow(v.y, 4) - pow(v.y, 6),
+                        6 * pow(v.x, 5) * v.y - 20 * pow(v.x, 3) * pow(v.y, 3) + 6 * v.x * pow(v.y, 5)
+                    )
+                    + c;
+                }
 
-                if (dot(v, v) < (r*r - 1)){
+                if (sqrt(dot(v, v)) < r){
                     m++;
                 }
                 v = clamp(v, -r, r);
-                if (length(v) > 2){
+                if (length(v) > _Threshold){
                     break;
                 }
             }

@@ -53,17 +53,33 @@ public class Julia : Fractal
             this.reZ = rez;
             this.imZ = imz;
             rp.finished = false;
-            switch(fp.algorithm){
-                case "Escape Algorithm":
-                    rp.drawingThread = StartCoroutine(Draw(rez, imz));
-                    break;
-                case "Henriksen Algorithm":
-                    rp.drawingThread = StartCoroutine(DrawHenriksen(reZ, imZ));
-                    break;
-                default:
-                    rp.drawingThread = StartCoroutine(Draw(rez, imz));
-                    break;
+            rp.finished = false;
+            if (!rp.parallel){
+                switch(fp.algorithm){
+                    case "Escape Algorithm":
+                        rp.drawingThread = StartCoroutine(Draw(reZ, imZ));
+                        break;
+                    case "Henriksen Algorithm":
+                        rp.drawingThread = StartCoroutine(DrawHenriksen(reZ, imZ));
+                        break;
+                    default:
+                        rp.drawingThread = StartCoroutine(Draw(reZ, imZ));
+                        break;
 
+                }
+            }else{
+                switch(fp.algorithm){   
+                    case "Escape Algorithm":
+                        rp.drawingThread = StartCoroutine(DrawParallelized(reZ, imZ));
+                        break;
+                    case "Henriksen Algorithm":
+                        rp.drawingThread = StartCoroutine(DrawHenriksenParallelized(reZ, imZ));
+                        break;
+                    default:
+                        rp.drawingThread = StartCoroutine(DrawParallelized(reZ, imZ));
+                        break;
+
+                }
             }
         }
     }

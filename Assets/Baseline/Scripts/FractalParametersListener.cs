@@ -112,7 +112,7 @@ public class FractalParametersListener : MonoBehaviour
         }
 
         if (allowEnterDegree && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))){
-            StartCoroutine(OnSubmit(inputFieldDegree, previousDegree, 2, 10));
+            StartCoroutine(OnSubmit(inputFieldDegree, previousDegree, 2, 6));
             allowEnterDegree = false;
         }else{
             allowEnterDegree = inputFieldDegree.isFocused;
@@ -143,6 +143,11 @@ public class FractalParametersListener : MonoBehaviour
                 }
                 if (string.Equals(inputField.tag, "InputFieldThreshold")){
                     fractalMandelbrot.fp.threshold = fractalJulia.fp.threshold = result;
+                    sliderThreshold.value = result;
+                    previousValue = result;
+                }
+                if (string.Equals(inputField.tag, "InputFieldDegree")){
+                    fractalMandelbrot.fp.degree = fractalJulia.fp.degree = result;
                     sliderThreshold.value = result;
                     previousValue = result;
                 }

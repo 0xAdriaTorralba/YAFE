@@ -27,6 +27,8 @@ public class InterfaceController : MonoBehaviour
 
     private TMP_InputField realPartJulia, imaginaryPartJulia;
 
+    private Toggle parallelToggle;
+
     private const string format = "F10";
 
     private double rezM, imzM, rezJ, imzJ;
@@ -66,6 +68,8 @@ public class InterfaceController : MonoBehaviour
 
         realPartJulia = GameObject.Find("Complex Number Julia/Input Real Julia").GetComponent<TMP_InputField>();
         imaginaryPartJulia = GameObject.Find("Complex Number Julia/Input Imaginary Julia").GetComponent<TMP_InputField>();
+
+        parallelToggle = GameObject.FindGameObjectWithTag("ParallelToggle").GetComponent<Toggle>();
 
         inputFields = new List<TMP_InputField>();
         inputFieldsJulia = new List<TMP_InputField>();
@@ -128,6 +132,8 @@ public class InterfaceController : MonoBehaviour
         leftJulia.onClick.AddListener(() => LeftJulia(defaultMovement));
         rightJulia.onClick.AddListener(() => RightJulia(defaultMovement));
         refreshJulia.onClick.AddListener(() => RefreshFractalJulia());
+
+        parallelToggle.onValueChanged.AddListener((value) => ToggleParallel(value));
         
         textZoomM.text = fractalMandelbrot.rp.xmax.ToString(format);
         textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
@@ -171,6 +177,14 @@ public class InterfaceController : MonoBehaviour
         RefreshFractalJulia();
         StartCoroutine(ListenerFractal(fractalMandelbrot, clMandelbrot, mandelbrotNumber));
         StartCoroutine(ListenerFractal(fractalJulia, clJulia, juliaNumber));
+    }
+
+    private void ToggleParallel(bool value){
+        parallelToggle.isOn = value;
+        fractalMandelbrot.rp.parallel = parallelToggle.isOn;
+        fractalJulia.rp.parallel = parallelToggle.isOn;
+        RefreshFractalMandelbrot();
+        RefreshFractalJulia();
     }
 
     private void ZoomInMandelbrot(double defaultZoom){
