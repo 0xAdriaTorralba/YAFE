@@ -128,8 +128,7 @@
                 }
             } 
             o.Albedo = color;
-            //o.Emission = color;
-            // Metallic and smoothness come from slider variables
+
             o.Alpha = color.a;
         }
         ENDCG

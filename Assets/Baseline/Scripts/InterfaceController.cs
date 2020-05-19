@@ -12,8 +12,8 @@ public class InterfaceController : MonoBehaviour
 
     private TextMeshProUGUI mandelbrotNumber, juliaNumber;
 
-    private Mandelbrot fractalMandelbrot;
-    private Julia fractalJulia;
+    private MandelbrotCPU fractalMandelbrot;
+    private JuliaCPU fractalJulia;
 
     private CoordinatesListener clMandelbrot, clJulia;
     private GameObject eventSystem;
@@ -29,7 +29,7 @@ public class InterfaceController : MonoBehaviour
 
     private Toggle parallelToggle;
 
-    private const string format = "F10";
+    private const string format = "F14";
 
     private double rezM, imzM, rezJ, imzJ;
 
@@ -49,8 +49,8 @@ public class InterfaceController : MonoBehaviour
         juliaNumber = GameObject.Find("Complex Number Julia/Julia Text").GetComponent<TextMeshProUGUI>();
 
 
-        fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<Mandelbrot>();
-        fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<Julia>();
+        fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<MandelbrotCPU>();
+        fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<JuliaCPU>();
 
 
 
@@ -191,6 +191,10 @@ public class InterfaceController : MonoBehaviour
         fractalMandelbrot.rp.xmax *= defaultZoom;
         fractalMandelbrot.rp.ymax *= defaultZoom;
 
+        Clamp(ref fractalMandelbrot.rp.xmax, 4e-13, 2.0);
+        Clamp(ref fractalMandelbrot.rp.ymax, 4e-13, 2.0);
+
+
         textZoomM.text = fractalMandelbrot.rp.xmax.ToString(format);
 
         //fractalMandelbrot.xmax = Mathf.Max((float)fractalMandelbrot.xmax, 1e-14f);
@@ -202,6 +206,9 @@ public class InterfaceController : MonoBehaviour
     private void ZoomOutMandelbrot(double defaultZoom){
         fractalMandelbrot.rp.xmax /= defaultZoom;
         fractalMandelbrot.rp.ymax /= defaultZoom;
+        
+        Clamp(ref fractalMandelbrot.rp.xmax, 4e-13, 2.0);
+        Clamp(ref fractalMandelbrot.rp.ymax, 4e-13, 2.0);
 
         textZoomM.text = fractalMandelbrot.rp.xmax.ToString(format);
 
@@ -214,6 +221,8 @@ public class InterfaceController : MonoBehaviour
     private void UpMandelbrot(double defaultMovement){
         fractalMandelbrot.rp.panY += defaultMovement;
 
+        Clamp(ref fractalMandelbrot.rp.panY, -2.0, 2.0);
+
         textPanYM.text = fractalMandelbrot.rp.panY.ToString(format);
 
         //fractalMandelbrot.panY = Mathf.Min((float) fractalMandelbrot.panY, 2);
@@ -223,6 +232,8 @@ public class InterfaceController : MonoBehaviour
 
     private void DownMandelbrot(double defaultMovement){
         fractalMandelbrot.rp.panY -= defaultMovement;
+
+        Clamp(ref fractalMandelbrot.rp.panY, -2.0, 2.0);
 
         textPanYM.text = fractalMandelbrot.rp.panY.ToString(format);
 
@@ -234,6 +245,9 @@ public class InterfaceController : MonoBehaviour
     private void LeftMandelbrot(double defaultMovement){
         fractalMandelbrot.rp.panX -= defaultMovement;
 
+        Clamp(ref fractalMandelbrot.rp.panX, -2.0, 2.0);
+
+
         textPanXM.text = fractalMandelbrot.rp.panX.ToString(format);
 
         //fractalMandelbrot.panX = Mathf.Max((float) fractalMandelbrot.panX, -2);
@@ -243,6 +257,8 @@ public class InterfaceController : MonoBehaviour
 
     private void RightMandelbrot(double defaultMovement){
         fractalMandelbrot.rp.panX += defaultMovement;
+    
+        Clamp(ref fractalMandelbrot.rp.panY, -2.0, 2.0);
 
         textPanXM.text = fractalMandelbrot.rp.panX.ToString(format);
 
@@ -262,6 +278,9 @@ public class InterfaceController : MonoBehaviour
         fractalJulia.rp.xmax *= defaultZoom;
         fractalJulia.rp.ymax *= defaultZoom;
 
+        Clamp(ref fractalJulia.rp.xmax, 4e-13, 2.0);
+        Clamp(ref fractalJulia.rp.ymax, 4e-13, 2.0);
+
         textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
 
         //fractalJulia.xmax = Mathf.Max((float)fractalJulia.xmax, 1e-14f);
@@ -273,6 +292,9 @@ public class InterfaceController : MonoBehaviour
     private void ZoomOutJulia(double defaultZoom){
         fractalJulia.rp.xmax /= defaultZoom;
         fractalJulia.rp.ymax /= defaultZoom;
+
+        Clamp(ref fractalJulia.rp.xmax, 4e-13, 2.0);
+        Clamp(ref fractalJulia.rp.ymax, 4e-13, 2.0);
 
         textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
 
@@ -286,6 +308,8 @@ public class InterfaceController : MonoBehaviour
        private void UpJulia(double defaultMovement){
         fractalJulia.rp.panY += defaultMovement;
 
+        Clamp(ref fractalJulia.rp.panY, -2.0, 2.0);
+
         textPanYJ.text = fractalJulia.rp.panY.ToString(format);
 
         //fractalJulia.panY = Mathf.Min((float) fractalJulia.panY, 2);
@@ -295,6 +319,9 @@ public class InterfaceController : MonoBehaviour
 
     private void DownJulia(double defaultMovement){
         fractalJulia.rp.panY -= defaultMovement;
+
+        Clamp(ref fractalJulia.rp.panY, -2.0, 2.0);
+
 
         textPanYJ.text = fractalJulia.rp.panY.ToString(format);
 
@@ -307,6 +334,8 @@ public class InterfaceController : MonoBehaviour
     private void LeftJulia(double defaultMovement){
         fractalJulia.rp.panX -= defaultMovement;
 
+        Clamp(ref fractalJulia.rp.panX, -2.0, 2.0);
+
         textPanXJ.text = fractalJulia.rp.panX.ToString(format);
 
         //fractalJulia.panX = Mathf.Max((float) fractalJulia.panX, -2);
@@ -316,6 +345,8 @@ public class InterfaceController : MonoBehaviour
 
     private void RightJulia(double defaultMovement){
         fractalJulia.rp.panX += defaultMovement;
+
+        Clamp(ref fractalJulia.rp.panX, -2.0, 2.0);
 
         textPanXJ.text = fractalJulia.rp.panX.ToString(format);
 
@@ -343,16 +374,17 @@ public class InterfaceController : MonoBehaviour
         fractal.rp.panY = imz;
         fractal.rp.xmax *= defaultZoom;
         fractal.rp.ymax *= defaultZoom;
-        if (fractal is Mandelbrot){
+        if (fractal is MandelbrotCPU){
             inputFields[0].text = fractal.rp.xmax.ToString(format);
             inputFields[1].text = fractal.rp.panX.ToString(format);
             inputFields[2].text = fractal.rp.panY.ToString(format);
-            fractal.StartDraw();
-        }else{
+            ((MandelbrotCPU) fractal).StartDraw();
+        }
+        if (fractal is JuliaCPU){
             inputFields[3].text = fractal.rp.xmax.ToString(format);
             inputFields[4].text = fractal.rp.panX.ToString(format);
             inputFields[5].text = fractal.rp.panY.ToString(format);
-            ((Julia) fractal).RedrawCurrent();
+            ((JuliaCPU) fractal).RedrawCurrent();
         }
     }
 
@@ -361,16 +393,17 @@ public class InterfaceController : MonoBehaviour
         fractal.rp.panY = imz;
         fractal.rp.xmax /= defaultZoom;
         fractal.rp.ymax /= defaultZoom;
-        if (fractal is Mandelbrot){
+        if (fractal is MandelbrotCPU){
             inputFields[0].text = fractal.rp.xmax.ToString(format);
             inputFields[1].text = fractal.rp.panX.ToString(format);
             inputFields[2].text = fractal.rp.panY.ToString(format);
-            fractal.StartDraw();
-        }else{
+            ((MandelbrotCPU) fractal).StartDraw();
+        }
+        if (fractal is JuliaCPU){
             inputFields[3].text = fractal.rp.xmax.ToString(format);
             inputFields[4].text = fractal.rp.panX.ToString(format);
             inputFields[5].text = fractal.rp.panY.ToString(format);
-            ((Julia) fractal).RedrawCurrent();
+            ((JuliaCPU) fractal).RedrawCurrent();
         }
     }
 
@@ -538,21 +571,30 @@ public class InterfaceController : MonoBehaviour
         while (true){
             if (coordinatesListener.getIsPointerIn()){
                 
-                if (fractal is Mandelbrot){
+                if (fractal is MandelbrotCPU){
                     rezM = fractal.GetViewPortX(coordinatesListener.getX());
                     imzM = fractal.GetViewPortY(coordinatesListener.getY());
-                    if (imzM < 0) text.text = "c = "+ rezM + " - i "+ Math.Abs(imzM);
-                    else text.text = "c = "+ rezM + " + i "+ imzM;
-                }else if (fractal is Julia){
+                    if (imzM < 0) text.text = "c = "+ rezM.ToString(format) + " - i "+ Math.Abs(imzM).ToString(format);
+                    else text.text = "c = "+ rezM.ToString(format) + " + i "+ imzM.ToString(format);
+                }else if (fractal is JuliaCPU){
                     rezJ = fractal.GetViewPortX(coordinatesListener.getX());
                     imzJ = fractal.GetViewPortY(coordinatesListener.getY());
-                    if (imzJ < 0) text.text = "z = "+ rezJ + " - i "+ Math.Abs(imzJ);
-                    else text.text = "z = "+ rezJ + " + i "+ imzJ;
+                    if (imzJ < 0) text.text = "z = "+ rezJ.ToString(format) + " - i "+ Math.Abs(imzJ).ToString(format);
+                    else text.text = "z = "+ rezJ.ToString(format) + " + i "+ imzJ.ToString(format);
                 }
                 
             }
             yield return new WaitForEndOfFrame();
 
+        }
+    }
+
+    private void Clamp(ref double value, double min, double max){
+        if (value < min){
+            value = min;
+        }
+        if (value > max){
+            value = max;
         }
     }
 

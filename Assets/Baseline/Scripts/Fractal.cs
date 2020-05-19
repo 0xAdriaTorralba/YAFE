@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-
 
 
 [System.Serializable]
@@ -38,46 +36,10 @@ public class FractalParameters{
 public abstract class Fractal : MonoBehaviour
 {
 
-    public class ColorData{
-        public Color color;
-        public int x;
-        public int y;
-
-        public ColorData(Color color, int x, int y){
-            this.color = color;
-            this.x = x;
-            this.y = y;
-     }
-    }
-
     public RenderingParameters rp;
     public FractalParameters fp;
 
-
-
-
-    void Awake(){
-        
-        
-
-    }
-
-    void Start(){
-        
-    }
-
-    void Update(){
-        
-    }
-
-    public abstract void StartDraw();
-
-    public abstract void OnEnable();
-
-    public float GetProgress(){
-        return (float) rp.count / (rp.pwidth * rp.pheight);
-    }
-
+    
     public bool GetFinished(){
         return rp.finished;
     }
@@ -99,8 +61,4 @@ public abstract class Fractal : MonoBehaviour
         }
     }
 
-    protected IEnumerator Draw(){
-        yield return null;
-        throw new Exception("ERROR! You need to implement your own draw function!");
-    }
 }

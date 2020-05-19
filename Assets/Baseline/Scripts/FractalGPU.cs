@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FractalGPU : MonoBehaviour
+public class FractalGPU : Fractal
 {
-    public RenderingParameters rp;
-    public FractalParameters fp;
-
     protected Image image;
     protected Material material;
 
 
     void Awake(){
-        // This script should be ALWAYS attached to GO with an image.
+        // This script should be ALWAYS attached to a GO with an image.
         image = GetComponent<Image>();
         material = image.material;
+        rp.tex2D = new Texture2D(rp.pwidth, rp.pheight);
+        image.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
+        this.rp.finished = true;
     }
 
 
@@ -26,15 +26,6 @@ public class FractalGPU : MonoBehaviour
 
 
     // BEGIN OF PROTECTED METHODS
-
-    protected void CorrectAspectRatio(){
-        double ratio = rp.pwidth / rp.pheight;
-        if (ratio > 1.0){
-            rp.xmax *= ratio;
-        }else{
-            rp.ymax /= ratio;
-        }
-    }
 
     protected void RedrawZoom(){
         material.SetColor("_Zoom", new Vector4((float)rp.xmax, (float)rp.ymax, 0.0f, 0.0f));

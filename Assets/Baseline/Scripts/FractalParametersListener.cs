@@ -7,8 +7,8 @@ using UnityEngine.UI;
 public class FractalParametersListener : MonoBehaviour
 {
 
-    private Mandelbrot fractalMandelbrot;
-    private Julia fractalJulia;
+    private Fractal fractalMandelbrot;
+    private Fractal fractalJulia;
 
     private InterfaceController interfaceController;
 
@@ -36,8 +36,8 @@ public class FractalParametersListener : MonoBehaviour
         inputFieldThreshold = GameObject.FindGameObjectWithTag("InputFieldThreshold").GetComponent<TMP_InputField>();
         inputFieldDegree = GameObject.FindGameObjectWithTag("InputFieldDegree").GetComponent<TMP_InputField>();
 
-        fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<Mandelbrot>();
-        fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<Julia>();
+        fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<Fractal>();
+        fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<Fractal>();
 
         interfaceController = GameObject.FindGameObjectWithTag("InterfaceController").GetComponent<InterfaceController>();
 
