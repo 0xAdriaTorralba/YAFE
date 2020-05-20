@@ -29,6 +29,8 @@ TagManager:
   - PercentageMandelbrot
   - ParallelToggle
   - SmoothToggle
+  - MandelbrotQuad
+  - JuliaQuad
   layers:
   - Default
   - TransparentFX

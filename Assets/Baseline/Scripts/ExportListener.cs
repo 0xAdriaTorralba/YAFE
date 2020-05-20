@@ -6,10 +6,23 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using SFB;
 using TMPro;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System.Numerics;
+using System;
+using UnityEngine.UI;
+using System.Threading.Tasks;
+using TMPro;
+
+
 
 [RequireComponent(typeof(Button))]
 public class ExportListener : MonoBehaviour, IPointerDownHandler {
 
+
+    public GameObject mandelbrotGPU, juliaGPU;
     private byte[] _textureBytes;
 
     private Button button;
@@ -40,6 +53,8 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
         }
         dropdownFormatMandelbrot = GameObject.Find("Format Mandelbrot Dropdown").GetComponent<TMP_Dropdown>();
         dropdownFormatJulia = GameObject.Find("Format Julia Dropdown").GetComponent<TMP_Dropdown>();
+
+
 
     }
 
@@ -79,13 +94,47 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
     [DllImport("__Internal")]
     private static extern void DownloadFile(string gameObjectName, string methodName, string filename, byte[] byteArray, int byteArraySize);
 
+
+    private Texture2D TextureToTexture2D(Texture texture)
+    {
+        Texture2D texture2D = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
+        RenderTexture currentRT = RenderTexture.active;
+        RenderTexture renderTexture = RenderTexture.GetTemporary(texture.width, texture.height, 32);
+        Graphics.Blit(texture, renderTexture);
+
+        RenderTexture.active = renderTexture;
+        texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+        texture2D.Apply();
+
+        RenderTexture.active = currentRT;
+        RenderTexture.ReleaseTemporary(renderTexture);
+        return texture2D;
+    }
+
     // Broser plugin should be called in OnPointerDown.
     public void OnPointerDown(PointerEventData eventData) {
-        Sprite image = fractal.GetComponent<Image>().sprite;
-        Texture2D texture = image.texture;
+        StartCoroutine(ExportImage());
+    }
+
+    private IEnumerator ExportImage(){
+        Texture2D texture = null;
+        if (fractal is FractalGPU){
+            if (fractal is MandelbrotGPU){
+                mandelbrotGPU.SetActive(true);
+            }
+            if (fractal is JuliaGPU){
+                juliaGPU.SetActive(true);
+            }
+            yield return new WaitForSeconds(1.0f);
+            texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
+        }
+        if (fractal is FractalCPU){
+            Sprite image = fractal.GetComponent<Image>().sprite;
+            texture = image.texture;
+        }
         if (texture == null){
             LogsController.UpdateLogs(new string[] {"Cannot save! The image is not completed (yet)."}, "#FFA600");
-            return;
+            yield return null;
         }
         if (fractal is MandelbrotCPU || fractal is MandelbrotGPU){
             switch(formatMandelbrot){
@@ -99,7 +148,7 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
                     break;
                 default:
                     _textureBytes = texture.EncodeToPNG();
-                    DownloadFile(gameObject.name, "OnFileDownload", "MandelbrotImage_"+countMandelbrot+formatMandelbrot, _textureBytes, _textureBytes.Length);
+                    DownloadFile(gameObject.name, "OnFileDownload", "MandelbrotImage_"+countMandelbrot+".png", _textureBytes, _textureBytes.Length);
                     break;
             }
         }
@@ -116,15 +165,26 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
                     break;
                 default:
                     _textureBytes = texture.EncodeToPNG();
-                    DownloadFile(gameObject.name, "OnFileDownload", "JuliaImage_"+countJulia+formatJulia, _textureBytes, _textureBytes.Length);
+                    DownloadFile(gameObject.name, "OnFileDownload", "JuliaImage_"+countJulia+".png", _textureBytes, _textureBytes.Length);
                     break;
             }
+        }
+        if (fractal is MandelbrotGPU){
+            mandelbrotGPU.SetActive(false);
+        }
+        if (fractal is JuliaGPU){
+            juliaGPU.SetActive(false);
         }
     }
 
     // Called from browser
     public void OnFileDownload() {
-        countMandelbrot++;
+        if (fractal is MandelbrotCPU || fractal is MandelbrotGPU){
+            countMandelbrot++;
+        }
+        if (fractal is JuliaCPU || fractal is JuliaGPU){
+            countJulia++;
+        }
         LogsController.UpdateLogs(new string[] {"Image exported successfully!"}, "#75FF00");
 
     }
@@ -144,13 +204,41 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
     }
 
     public void OnClick() {
-        ExportImage(fractal);
+        StartCoroutine(ExportImage(fractal));
     }
 
-    private void ExportImage(Fractal fractal){
+    private Texture2D TextureToTexture2D(Texture texture)
+    {
+        Texture2D texture2D = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
+        RenderTexture currentRT = RenderTexture.active;
+        RenderTexture renderTexture = RenderTexture.GetTemporary(texture.width, texture.height, 32);
+        Graphics.Blit(texture, renderTexture);
+
+        RenderTexture.active = renderTexture;
+        texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+        texture2D.Apply();
+
+        RenderTexture.active = currentRT;
+        RenderTexture.ReleaseTemporary(renderTexture);
+        return texture2D;
+    }
+
+
+
+
+
+    private IEnumerator ExportImage(Fractal fractal){
         Texture2D texture = null;
         if (fractal is FractalGPU){
-            //texture = GetTextureFromSurfaceShader(fractal.GetComponent<Image>().material, fractal.rp.pwidth, fractal.rp.pheight);
+            //texture = GetTextureFromSurfaceShader(fractal.GetComponent<Image>().material, fractal.rp.pwidth, fractal.rp.pheight, RenderTexture.main);
+            if (fractal is MandelbrotGPU){
+                mandelbrotGPU.SetActive(true);
+            }
+            if (fractal is JuliaGPU){
+                juliaGPU.SetActive(true);
+            }
+            yield return new WaitForSeconds(1.0f);
+            texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
         }
         if (fractal is FractalCPU){
             Sprite image = fractal.GetComponent<Image>().sprite;
@@ -159,7 +247,7 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
 
         if (texture == null){
             LogsController.UpdateLogs(new string[] {"Cannot save! The image is not completed (yet)."}, "#FFA600");
-            return;
+            yield return null;
         }
 
         if (fractal is MandelbrotCPU || fractal is MandelbrotGPU){
@@ -191,7 +279,12 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
             countJulia++;
         }
         LogsController.UpdateLogs(new string[] {"Image exported successfully!"}, "#75FF00");
-
+        if (fractal is MandelbrotGPU){
+            mandelbrotGPU.SetActive(false);
+        }
+        if (fractal is JuliaGPU){
+            juliaGPU.SetActive(false);
+        }
     }
 
 
@@ -209,63 +302,36 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
     }
 
     public void OnClick() {
-        ExportImage(fractal);
+        StartCoroutine(ExportImage(fractal));
     }
 
-    public Texture2D GetTextureFromSurfaceShader(Material mat, int width, int height)
+     private Texture2D TextureToTexture2D(Texture texture)
     {
-        //Create render texture:
-        RenderTexture temp = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
- 
-        //Create a Quad:
-        GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        MeshRenderer rend = quad.GetComponent<MeshRenderer>();
-        rend.material = mat;
-        Vector3 quadScale = quad.transform.localScale / (float)((Screen.height / 2.0) / Camera.main.orthographicSize);
-        quad.transform.position = Vector3.forward;
- 
-        //Setup camera:
-        GameObject camGO = new GameObject("CaptureCam");
-        Camera cam = camGO.AddComponent<Camera>();
-        cam.renderingPath = RenderingPath.Forward;
-        cam.orthographic = true;
-        cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.backgroundColor = new Color(1, 1, 1, 0);
-        if (cam.rect.width < 1 || cam.rect.height < 1)
-        {
-            cam.rect = new Rect(cam.rect.x, cam.rect.y, 1, 1);
-        }
-        cam.orthographicSize = 0.5f;
-        cam.rect = new Rect(0, 0, quadScale.x, quadScale.y);
-        cam.aspect = quadScale.x / quadScale.y;
-        cam.targetTexture = temp;
-        cam.allowHDR = false;
- 
- 
-        //Capture image and write to the render texture:
+        Texture2D texture2D = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
+        RenderTexture currentRT = RenderTexture.active;
+        RenderTexture renderTexture = RenderTexture.GetTemporary(texture.width, texture.height, 32);
+        Graphics.Blit(texture, renderTexture);
 
-        temp = cam.targetTexture;
- 
-        //Apply changes:
-        Texture2D newTex = new Texture2D(temp.width, temp.height, TextureFormat.ARGB32, true, true);
-        RenderTexture.active = cam.targetTexture;
-        cam.Render();
-        newTex.ReadPixels(new Rect(0, 0, temp.width, temp.height), 0, 0);
-        newTex.Apply();
- 
-        //Clean up:
-        RenderTexture.active = null;
-        temp.Release();
-        Destroy(quad);
-        Destroy(camGO);
- 
-        return newTex;
+        RenderTexture.active = renderTexture;
+        texture2D.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+        texture2D.Apply();
+
+        RenderTexture.active = currentRT;
+        RenderTexture.ReleaseTemporary(renderTexture);
+        return texture2D;
     }
 
-    private void ExportImage(Fractal fractal){
+    private IEnumerator ExportImage(Fractal fractal){
         Texture2D texture = null;
         if (fractal is FractalGPU){
-            texture = GetTextureFromSurfaceShader(fractal.GetComponent<Image>().material, fractal.rp.pwidth, fractal.rp.pheight);
+            if (fractal is MandelbrotGPU){
+                mandelbrotGPU.SetActive(true);
+            }
+            if (fractal is JuliaGPU){
+                juliaGPU.SetActive(true);
+            }
+            yield return new WaitForSeconds(1.0f);
+            texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
         }
         if (fractal is FractalCPU){
             Sprite image = fractal.GetComponent<Image>().sprite;
@@ -274,7 +340,7 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
 
         if (texture == null){
             LogsController.UpdateLogs(new string[] {"Cannot save! The image is not completed (yet)."}, "#FFA600");
-            return;
+            yield return null;
         }
 
         if (fractal is MandelbrotCPU || fractal is MandelbrotGPU){
@@ -317,6 +383,12 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
 
         }
         LogsController.UpdateLogs(new string[] {"Image exported successfully!"}, "#75FF00");
+        if (fractal is MandelbrotGPU){
+            mandelbrotGPU.SetActive(false);
+        }
+        if (fractal is JuliaGPU){
+            juliaGPU.SetActive(false);
+        }
 
     }
 

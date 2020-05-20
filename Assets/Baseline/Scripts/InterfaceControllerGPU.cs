@@ -12,6 +12,8 @@ public class InterfaceControllerGPU : MonoBehaviour
 
     private TextMeshProUGUI mandelbrotNumber, juliaNumber;
 
+    private GameObject mandelbrotGPU, juliaGPU;
+
     private MandelbrotGPU fractalMandelbrot;
     private JuliaGPU fractalJulia;
 
@@ -47,6 +49,12 @@ public class InterfaceControllerGPU : MonoBehaviour
         // Finds
         mandelbrotNumber = GameObject.Find("Complex Number Mandelbrot/Mandelbrot Text").GetComponent<TextMeshProUGUI>();
         juliaNumber = GameObject.Find("Complex Number Julia/Julia Text").GetComponent<TextMeshProUGUI>();
+
+        mandelbrotGPU = GameObject.Find("Mandelbrot Auxiliar Renderer");
+        mandelbrotGPU.SetActive(false);
+
+        juliaGPU = GameObject.Find("Julia Auxiliar Renderer");
+        juliaGPU.SetActive(false);
 
         fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<MandelbrotGPU>();
         fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<JuliaGPU>();

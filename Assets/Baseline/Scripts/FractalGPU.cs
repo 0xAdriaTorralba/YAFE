@@ -5,16 +5,16 @@ using UnityEngine.UI;
 
 public class FractalGPU : Fractal
 {
-    protected Image image;
+    protected RawImage image;
     protected Material material;
 
 
     void Awake(){
         // This script should be ALWAYS attached to a GO with an image.
-        image = GetComponent<Image>();
-        material = image.material;
+        image = GetComponent<RawImage>();
+        material = image.materialForRendering;
         rp.tex2D = new Texture2D(rp.pwidth, rp.pheight);
-        image.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
+        //image.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
         this.rp.finished = true;
     }
 
