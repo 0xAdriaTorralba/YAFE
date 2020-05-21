@@ -20,6 +20,8 @@ public class JuliaCPU : FractalCPU
     private Image progressBar;
     private TextMeshProUGUI percentage;
 
+    private string format = "F8";
+
 
     void Awake(){
         rp.fractalImage = GetComponent<Image>();
@@ -333,7 +335,7 @@ public class JuliaCPU : FractalCPU
         int oldX = x, oldY = y;
         Complex z = originalPoint;
         int i = 0;
-        double tol = (rp.xmax - rp.xmin) / 2.0;
+        double tol = (rp.xmax - rp.xmin) / 4.0;
         bool escape = false;
         do{
             z = Complex.Pow(z, fp.degree) + new Complex(this.reZ, this.imZ);
@@ -350,12 +352,12 @@ public class JuliaCPU : FractalCPU
         }while(i < fp.maxIters && Complex.Abs(originalPoint - z) > tol);
         if (!escape){
             if (Complex.Abs(originalPoint - z) > tol){
-                LogsController.UpdateLogs(new string[] {"We cannot calculate the periodic orbit for the point ("+originalPoint.Real + ", "+originalPoint.Imaginary+")."}, "#FFFFFF");
+                LogsController.UpdateLogs(new string[] {"We cannot calculate the periodic orbit for the point ("+originalPoint.Real.ToString(format) + ", "+originalPoint.Imaginary.ToString(format)+")."}, "#FFFFFF");
             }else{
-                LogsController.UpdateLogs(new string[] {"The point ("+originalPoint.Real + ", "+originalPoint.Imaginary+") belongs to a periodic orbit of periode " + i+ "."}, "#FFFFFF");
+                LogsController.UpdateLogs(new string[] {"The point ("+originalPoint.Real.ToString(format) + ", "+originalPoint.Imaginary.ToString(format)+") belongs to a periodic orbit of periode " + i+ "."}, "#FFFFFF");
             }
         }else{
-            LogsController.UpdateLogs(new string[] {"The point ("+originalPoint.Real + ", "+originalPoint.Imaginary+" does not converge!"}, "#FFFFFF");
+            LogsController.UpdateLogs(new string[] {"The point ("+originalPoint.Real.ToString(format) + ", "+originalPoint.Imaginary.ToString(format)+" does not converge!"}, "#FFFFFF");
 
         }
         rp.tex2D.Apply();

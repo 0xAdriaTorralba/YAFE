@@ -43,8 +43,8 @@ public class RaymarchGeneric : SceneViewFilter
         get
         {
             if (!_CurrentCamera)
-                //_CurrentCamera = GetComponent<Camera>();
-                _CurrentCamera = Camera.main;
+                _CurrentCamera = GetComponent<Camera>();
+                //_CurrentCamera = Camera.main;
             return _CurrentCamera;
         }
     }
