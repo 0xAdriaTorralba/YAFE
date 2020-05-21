@@ -218,7 +218,7 @@ Shader "Custom/RaymarchGeneric"
 				float2 res;
 				for (i = 0; i < maxstep; i++) {
 					t = from + totalDistance * direction;
-					res = DE(t); // res.x = distance, res.y = iter on el fractal 'convergeix'
+					res = mandelbulbDE(t); // res.x = distance, res.y = iter on el fractal 'convergeix'
 					totalDistance += res.x;
 					
 					//if (res.y == 64) break; // 64 \equiv maxiters de mandelbulbDE de NO convergir
@@ -237,15 +237,15 @@ Shader "Custom/RaymarchGeneric"
 				// TODO posar color com a 2D (usant el iterat)
 				aux1 = float3(t.x+h, t.y, t.z);
 				aux2 = float3(t.x-h, t.y, t.z);
-				normal_x = ( DE(aux1) - DE(aux2) ) / ( 2*h );
+				normal_x = ( mandelbulbDE(aux1) - mandelbulbDE(aux2) ) / ( 2*h );
 
 				aux1 = float3(t.x, t.y+h, t.z);
 				aux2 = float3(t.x-h, t.y-h, t.z);
-				normal_y = ( DE(aux1) - DE(aux2) ) / ( 2*h );
+				normal_y = ( mandelbulbDE(aux1) - mandelbulbDE(aux2) ) / ( 2*h );
 
 				aux1 = float3(t.x, t.y, t.z+h);
 				aux2 = float3(t.x, t.y, t.z-h);
-				normal_z = ( DE(aux1) - DE(aux2) ) / ( 2*h );
+				normal_z = ( mandelbulbDE(aux1) - mandelbulbDE(aux2) ) / ( 2*h );
 
 				normal = float3(normal_x, normal_y, normal_z);
 

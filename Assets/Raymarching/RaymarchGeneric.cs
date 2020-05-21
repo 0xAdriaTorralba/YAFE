@@ -18,8 +18,10 @@ public class RaymarchGeneric : SceneViewFilter
     [SerializeField]
     private bool _DebugPerformance = false;
 
+    private RenderTexture source, destination;
+
     [Range (2, 20)]
-    public int Power = 2;
+    public int power = 2;
 
     public Material EffectMaterial
     {
@@ -41,7 +43,8 @@ public class RaymarchGeneric : SceneViewFilter
         get
         {
             if (!_CurrentCamera)
-                _CurrentCamera = GetComponent<Camera>();
+                //_CurrentCamera = GetComponent<Camera>();
+                _CurrentCamera = Camera.main;
             return _CurrentCamera;
         }
     }
@@ -81,6 +84,8 @@ public class RaymarchGeneric : SceneViewFilter
     [ImageEffectOpaque]
     void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
+        this.source = source;
+        this.destination = destination;
         if (!EffectMaterial)
         {
             Graphics.Blit(source, destination); // do nothing
@@ -109,7 +114,52 @@ public class RaymarchGeneric : SceneViewFilter
         EffectMaterial.SetTexture("_ColorRamp_PerfMap", _PerfColorRamp);
 
         EffectMaterial.SetFloat("_DrawDistance", _RaymarchDrawDistance);
-        EffectMaterial.SetFloat("_Power", Power);
+        EffectMaterial.SetFloat("_Power", power);
+
+        if(EffectMaterial.IsKeywordEnabled("DEBUG_PERFORMANCE") != _DebugPerformance) {
+            if(_DebugPerformance)
+                EffectMaterial.EnableKeyword("DEBUG_PERFORMANCE");
+            else
+                EffectMaterial.DisableKeyword("DEBUG_PERFORMANCE");
+        }
+
+        EffectMaterial.SetMatrix("_FrustumCornersES", GetFrustumCorners(CurrentCamera));
+        EffectMaterial.SetMatrix("_CameraInvViewMatrix", CurrentCamera.cameraToWorldMatrix);
+        EffectMaterial.SetVector("_CameraWS", CurrentCamera.transform.position);
+    
+        CustomGraphicsBlit(source, destination, EffectMaterial, 0);
+    }
+
+    void OnPostRender(){
+          if (!EffectMaterial)
+        {
+            Graphics.Blit(source, destination); // do nothing
+            return;
+        }
+
+        // Set any custom shader variables here.  For example, you could do:
+        // EffectMaterial.SetFloat("_MyVariable", 13.37f);
+        // This would set the shader uniform _MyVariable to value 13.37
+
+        EffectMaterial.SetVector("_LightDir", SunLight ? SunLight.forward : Vector3.down);
+
+        // Construct a Model Matrix for the Torus
+        Matrix4x4 MatTorus = Matrix4x4.TRS(
+            Vector3.right * Mathf.Sin(Time.time) * 5, 
+            Quaternion.identity,
+            Vector3.one);
+        MatTorus *= Matrix4x4.TRS(
+            Vector3.zero, 
+            Quaternion.Euler(new Vector3(0, 0, (Time.time * 200) % 360)), 
+            Vector3.one);
+        // Send the torus matrix to our shader
+        EffectMaterial.SetMatrix("_MatTorus_InvModel", MatTorus.inverse);
+
+        EffectMaterial.SetTexture("_ColorRamp_Material", _MaterialColorRamp);
+        EffectMaterial.SetTexture("_ColorRamp_PerfMap", _PerfColorRamp);
+
+        EffectMaterial.SetFloat("_DrawDistance", _RaymarchDrawDistance);
+        EffectMaterial.SetFloat("_Power", power);
 
         if(EffectMaterial.IsKeywordEnabled("DEBUG_PERFORMANCE") != _DebugPerformance) {
             if(_DebugPerformance)

@@ -311,8 +311,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cabd8f550dd2451e8f9d5e799af9e34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SunLight: {fileID: 0}
-  _EffectShader: {fileID: 0}
+  SunLight: {fileID: 1334404839}
+  _EffectShader: {fileID: 4800000, guid: 09742a9e52e9516488b1cfc71d0e443b, type: 3}
   _MaterialColorRamp: {fileID: 0}
   _PerfColorRamp: {fileID: 0}
   _RaymarchDrawDistance: 40
