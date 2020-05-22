@@ -10,7 +10,7 @@ public class InterfaceController : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    private TextMeshProUGUI mandelbrotNumber, juliaNumber;
+    private TextMeshProUGUI mandelbrotNumber, juliaNumber, numImagesJuliaText;
 
     private MandelbrotCPU fractalMandelbrot;
     private JuliaCPU fractalJulia;
@@ -29,6 +29,8 @@ public class InterfaceController : MonoBehaviour
 
     private Toggle parallelToggle;
 
+    private Slider sliderNumImagesJulia;
+
     private const string format = "F14";
 
     private double rezM, imzM, rezJ, imzJ;
@@ -37,16 +39,16 @@ public class InterfaceController : MonoBehaviour
 
     private List<string> previousValues, previousValuesJulia;
     
-    private bool allowEnter, allowEnterJulia;
-
-
+    private bool allowEnter, allowEnterJulia, calculateJuliaImages = false;
     private double defaultZoom, defaultMovement;
+
     void Awake()
     {
         
         // Finds
         mandelbrotNumber = GameObject.Find("Complex Number Mandelbrot/Mandelbrot Text").GetComponent<TextMeshProUGUI>();
         juliaNumber = GameObject.Find("Complex Number Julia/Julia Text").GetComponent<TextMeshProUGUI>();
+        numImagesJuliaText = GameObject.Find("Num Images Label").GetComponent<TextMeshProUGUI>();
 
 
         fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<MandelbrotCPU>();
@@ -70,6 +72,8 @@ public class InterfaceController : MonoBehaviour
         imaginaryPartJulia = GameObject.Find("Complex Number Julia/Input Imaginary Julia").GetComponent<TMP_InputField>();
 
         parallelToggle = GameObject.FindGameObjectWithTag("ParallelToggle").GetComponent<Toggle>();
+
+        sliderNumImagesJulia = GameObject.Find("Slider Num Images Julia").GetComponent<Slider>();
 
         inputFields = new List<TMP_InputField>();
         inputFieldsJulia = new List<TMP_InputField>();
@@ -134,6 +138,8 @@ public class InterfaceController : MonoBehaviour
         refreshJulia.onClick.AddListener(() => RefreshFractalJulia());
 
         parallelToggle.onValueChanged.AddListener((value) => ToggleParallel(value));
+
+        sliderNumImagesJulia.onValueChanged.AddListener((value) => OnValueChangedSlider(sliderNumImagesJulia));
         
         textZoomM.text = fractalMandelbrot.rp.xmax.ToString(format);
         textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
@@ -177,7 +183,42 @@ public class InterfaceController : MonoBehaviour
         RefreshFractalJulia();
         StartCoroutine(ListenerFractal(fractalMandelbrot, clMandelbrot, mandelbrotNumber));
         StartCoroutine(ListenerFractal(fractalJulia, clJulia, juliaNumber));
+        StartCoroutine(DrawImagesJulia());
     }
+
+    private IEnumerator DrawImagesJulia(){
+        int x = (int) clJulia.getX();
+        int y = (int) clJulia.getY();
+        bool valuesChanged = true;
+        bool imageCleaned = true;
+        while(true){
+            if ((Input.GetKey(KeyCode.P) || Input.GetMouseButton(0)) && clJulia.getIsPointerIn() && fractalJulia.GetFinished()){
+                if (valuesChanged){
+                    fractalJulia.RestoreImage();
+                    x = (int) clJulia.getX();
+                    y = (int) clJulia.getY();
+                    fractalJulia.CalculateImageAndDrawImage(rezJ, imzJ, x, y);
+                    imageCleaned = false;
+                    valuesChanged = false;
+                }else{
+                    if (x != (int) clJulia.getX() || y != (int) clJulia.getY()){
+                        valuesChanged = true;
+                    }else{
+                        valuesChanged = false;
+                    }
+                }
+            }else{
+                if (!imageCleaned){
+                    fractalJulia.RestoreImage();
+                    imageCleaned = true;
+                }
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+
 
     private void ToggleParallel(bool value){
         parallelToggle.isOn = value;
@@ -185,6 +226,11 @@ public class InterfaceController : MonoBehaviour
         fractalJulia.rp.parallel = parallelToggle.isOn;
         RefreshFractalMandelbrot();
         RefreshFractalJulia();
+    }
+
+    private void OnValueChangedSlider(Slider slider){
+        fractalJulia.SetNumImages((int) slider.value);
+        numImagesJuliaText.text = (int) slider.value + "";
     }
 
     private void ZoomInMandelbrot(double defaultZoom){
@@ -435,10 +481,6 @@ public class InterfaceController : MonoBehaviour
 
         }
 
-
-        if(Input.GetMouseButtonDown(0) && clJulia.getIsPointerIn()){
-            fractalJulia.CalculateImageAndDrawImage(rezJ, imzJ, (int)clJulia.getX(), (int)clJulia.getY());
-        }
 
         if (allowEnter && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))) {
             StartCoroutine(OnSubmit ());

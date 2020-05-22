@@ -210,9 +210,8 @@ public class MandelbrotCPU : FractalCPU
             i = 0;
         }
         while (Complex.Abs(z) < fp.threshold && i < fp.maxIters){
-            //z = Complex.Pow(z, fp.degree) + c;
-            z = new Complex(z.Real * z.Real - z.Imaginary * z.Imaginary, 2.0 * z.Real * z.Imaginary) + c;
-            //lock(this){i++;}
+            z = Complex.Pow(z, fp.degree) + c;
+            //z = new Complex(z.Real * z.Real - z.Imaginary * z.Imaginary, 2.0 * z.Real * z.Imaginary) + c;
             i++;
         }
         return i;

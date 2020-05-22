@@ -12,6 +12,8 @@ public class JuliaCPU : FractalCPU
 {
     private static object lockObject = new object();
 
+    private Texture2D originalImage;
+
     private Color[] colors;
 
     public GameObject GOprogressBar;
@@ -22,10 +24,13 @@ public class JuliaCPU : FractalCPU
 
     private string format = "F8";
 
+    private int numImages = 1;
+
 
     void Awake(){
         rp.fractalImage = GetComponent<Image>();
         rp.tex2D = new Texture2D((int) rp.pwidth, (int) rp.pheight);
+        originalImage = new Texture2D((int) rp.pwidth, (int) rp.pheight);
         progressBar = GOprogressBar.transform.GetComponent<Image>();
         percentage = GOpercentage.transform.GetComponent<TextMeshProUGUI>();
     }
@@ -155,8 +160,8 @@ public class JuliaCPU : FractalCPU
             Parallel.For(0, rp.pheight, (int y) => {
                 Color value;
                 int i;
-                i = ComputeConvergenceHenriksen(x, y, reZ, imZ);
-                value = PickColor(i);
+                value = ComputeConvergenceHenriksenColor(x, y, reZ, imZ);
+                //value = PickColor(i);
                 results.Add(new ColorData(value, x, y));
                 lock(lockObject){
                     rp.count++;
@@ -179,6 +184,9 @@ public class JuliaCPU : FractalCPU
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
         watch.Stop();
+        Color[] aux = rp.tex2D.GetPixels();
+        originalImage = new Texture2D(rp.pwidth, rp.pheight);
+        originalImage.SetPixels(aux);
         LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
         
     }
@@ -199,8 +207,8 @@ public class JuliaCPU : FractalCPU
         for(int x = 0; x < rp.pwidth; x++){
             for (int y = 0; y < rp.pheight; y++){
                 Color value;
-                i = ComputeConvergenceHenriksen(x, y, reZ, imZ);
-                value = PickColor(i);
+                value = ComputeConvergenceHenriksenColor(x, y, reZ, imZ);
+                //value = PickColor(i);
                 rp.tex2D.SetPixel(x, y, value);
                 rp.count++;
                 
@@ -218,6 +226,9 @@ public class JuliaCPU : FractalCPU
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
         watch.Stop();
+        Color[] aux = rp.tex2D.GetPixels();
+        originalImage = new Texture2D(rp.pwidth, rp.pheight);
+        originalImage.SetPixels(aux);
         LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
         
     }
@@ -287,6 +298,9 @@ public class JuliaCPU : FractalCPU
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
         watch.Stop();
+        Color[] aux = rp.tex2D.GetPixels();
+        originalImage = new Texture2D(rp.pwidth, rp.pheight);
+        originalImage.SetPixels(aux);
         LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
         
     }
@@ -325,6 +339,9 @@ public class JuliaCPU : FractalCPU
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
         watch.Stop();
+        Color[] aux = rp.tex2D.GetPixels();
+        originalImage = new Texture2D(rp.pwidth, rp.pheight);
+        originalImage.SetPixels(aux);
         LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
         
     }
@@ -334,61 +351,74 @@ public class JuliaCPU : FractalCPU
         Complex originalPoint = new Complex(reZ, imZ);
         int oldX = x, oldY = y;
         Complex z = originalPoint;
-        int i = 0;
-        double tol = (rp.xmax - rp.xmin) / 4.0;
-        bool escape = false;
-        do{
+        Color[] aux = rp.tex2D.GetPixels();
+        originalImage = new Texture2D(rp.pwidth, rp.pheight);
+        originalImage.SetPixels(aux);
+        originalImage.Apply();
+        for (int k = 0; k < numImages; k++){
             z = Complex.Pow(z, fp.degree) + new Complex(this.reZ, this.imZ);
             cImageReZ = (int)((z.Real - rp.panX - rp.xmin) * (rp.pwidth / rp.viewPortWidth));
             cImageImZ = (int)((z.Imaginary - rp.panY - rp.ymin) * (rp.pheight / rp.viewPortHeight));
             DrawLine(rp.tex2D, new UnityEngine.Vector2 (oldX, oldY), new UnityEngine.Vector2 (cImageReZ, cImageImZ), Color.white);
-            i++;
             oldX = cImageReZ;
             oldY = cImageImZ;
-            if (Complex.Abs(z) > fp.threshold){
-                escape = true;
+            if (Complex.Abs(z) > 2){
                 break;
             }
-        }while(i < fp.maxIters && Complex.Abs(originalPoint - z) > tol);
-        if (!escape){
-            if (Complex.Abs(originalPoint - z) > tol){
-                LogsController.UpdateLogs(new string[] {"We cannot calculate the periodic orbit for the point ("+originalPoint.Real.ToString(format) + ", "+originalPoint.Imaginary.ToString(format)+")."}, "#FFFFFF");
-            }else{
-                LogsController.UpdateLogs(new string[] {"The point ("+originalPoint.Real.ToString(format) + ", "+originalPoint.Imaginary.ToString(format)+") belongs to a periodic orbit of periode " + i+ "."}, "#FFFFFF");
-            }
-        }else{
-            LogsController.UpdateLogs(new string[] {"The point ("+originalPoint.Real.ToString(format) + ", "+originalPoint.Imaginary.ToString(format)+" does not converge!"}, "#FFFFFF");
-
         }
         rp.tex2D.Apply();
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
     }
 
-    private int ComputeConvergenceHenriksen(int x, int y, double reZ, double imZ){
+    public void RestoreImage(){
+        rp.tex2D = originalImage;
+        rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
+    }
+
+    public int iters = 1000;
+    public int threshold = 1000;
+    public double tol = 1;
+
+    private Color ComputeConvergenceHenriksenColor(int x, int y, double reZ, double imZ){
         Complex z, w, dz, epsilon, c;
+        bool escaped;
         int i;
         lock(lockObject){
             rp.viewPortX = rp.xmin + ((double) x / rp.pwidth) * rp.viewPortWidth + rp.panX;
             rp.viewPortY = rp.ymin + ((double) y / rp.pheight) * rp.viewPortHeight + rp.panY;
             z = new Complex(rp.viewPortX, rp.viewPortY);
             w = new Complex(rp.viewPortX, rp.viewPortY);
-            dz = new Complex(1.0, 0.0);
+            dz = new Complex(1.0, 1.0);
             epsilon = new Complex(0.0, 0.0);
+            escaped = false;
             c = new Complex(reZ, imZ);
             i = 0;
         }
-        while (Complex.Abs(epsilon) < fp.threshold && i < fp.maxIters){
+        while (
+                i < iters && 
+                (Math.Abs(epsilon.Real) < tol && Math.Abs(epsilon.Imaginary) < tol) &&
+                !escaped
+            ){
             dz = fp.degree * Complex.Pow(z, fp.degree - 1) * dz;
             z = Complex.Pow(z, fp.degree) + c;
-            if (Complex.Abs(dz - 1) > 1e-12){
-                epsilon = (w - z) / (dz - 1);
-            }else{
-                return i;
+            if (Complex.Abs(z) > threshold){
+                escaped = true;
+            }
+            if (Complex.Abs(dz - 1) > 1e-8){
+                epsilon = (w - z) / (dz - 1.0);
             }
             i++;
+
         }
-        
-        return i;
+        if (!escaped){
+            if (i == iters){
+                return Color.red;
+            }else{
+                return Color.black;
+            }
+        }else{
+            return Color.white;
+        }
     }
 
     private int ComputeConvergence(int x, int y, double reZ, double imZ){
@@ -444,5 +474,13 @@ public class JuliaCPU : FractalCPU
                     return new Color(Mathf.Sin((float)i/4) / 4.0f + 0.75f, Mathf.Sin((float)i/5) / 4.0f + 0.75f, Mathf.Sin((float)i/7) / 4.0f + 0.75f, 1.0f);
                 }
         }
+    }
+
+    public void SetNumImages(int numImages){
+        this.numImages = numImages;
+    }
+
+    public int GetNumImages(){
+        return this.numImages;
     }
 }

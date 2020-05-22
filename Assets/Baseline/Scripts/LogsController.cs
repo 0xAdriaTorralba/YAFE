@@ -15,6 +15,10 @@ public class LogsController : MonoBehaviour
         instance = this;
     }
 
+    void OnEnable(){
+        instance = this;
+    }
+
     public static void UpdateLogs(string[] newLogs, String color){
         if (logs == null){
             logs = new Queue<string>();
