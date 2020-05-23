@@ -4199,9 +4199,9 @@ MonoBehaviour:
   GOpercentage: {fileID: 1924247658}
   reZ: 0
   imZ: 0
-  iters: 1000
-  threshold: 1000
-  tol: 1
+  iters: 100
+  threshold: 100
+  tol: 0.1
 --- !u!114 &209585141
 MonoBehaviour:
   m_ObjectHideFlags: 0

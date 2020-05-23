@@ -388,36 +388,47 @@ public class JuliaCPU : FractalCPU
             rp.viewPortY = rp.ymin + ((double) y / rp.pheight) * rp.viewPortHeight + rp.panY;
             z = new Complex(rp.viewPortX, rp.viewPortY);
             w = new Complex(rp.viewPortX, rp.viewPortY);
-            dz = new Complex(1.0, 1.0);
-            epsilon = new Complex(0.0, 0.0);
+            dz = new Complex(1.0, 0.0);
+            epsilon = new Complex(50.0, 50.0);
             escaped = false;
             c = new Complex(reZ, imZ);
             i = 0;
         }
         while (
                 i < iters && 
-                (Math.Abs(epsilon.Real) < tol && Math.Abs(epsilon.Imaginary) < tol) &&
+                //(Math.Abs(epsilon.Real) > tol && Math.Abs(epsilon.Imaginary) > tol) &&
                 !escaped
             ){
             dz = fp.degree * Complex.Pow(z, fp.degree - 1) * dz;
             z = Complex.Pow(z, fp.degree) + c;
-            if (Complex.Abs(z) > threshold){
-                escaped = true;
-            }
+            // if (Complex.Abs(z) > threshold){
+            //     escaped = true;
+            // }
             if (Complex.Abs(dz - 1) > 1e-8){
                 epsilon = (w - z) / (dz - 1.0);
+            }else{
+                return PickColor(i);
+            }
+            if ((Math.Abs(epsilon.Real) < tol && Math.Abs(epsilon.Imaginary) < tol)){
+                escaped = true;
             }
             i++;
 
         }
-        if (!escaped){
-            if (i == iters){
-                return Color.red;
+        //return PickColor(i);
+        if (escaped){
+            // if (i == iters){
+            //     return Color.red;
+            // }else{
+            //     return Color.black;
+            // }
+            if (i==iters){
+                return Color.green;
             }else{
                 return Color.black;
             }
         }else{
-            return Color.white;
+            return PickColor(i);
         }
     }
 
