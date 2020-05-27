@@ -70,7 +70,7 @@ public class CameraMovementController : MonoBehaviour
  
         }
         if (smoothMovement){
-            // Apply Lerp function to smooth view
+            // Apply Lerp function for smooth view
             smoothScale = Mathf.Lerp(smoothScale, scale, .05f);
             smoothPosition = Vector2.Lerp(smoothPosition, newPosition, .05f);
         }else{

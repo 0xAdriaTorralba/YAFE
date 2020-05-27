@@ -173,12 +173,4 @@ public class FractalGPU : Fractal
         this.rp.panY = panY;
     }
 
-    public double GetViewPortX(double x){
-        return this.rp.xmin + ((double) x / this.rp.pwidth) * this.rp.viewPortWidth - this.rp.panX;
-    }
-
-    public double GetViewPortY(double y){
-        return this.rp.ymin + ((double) y / this.rp.pheight) * this.rp.viewPortHeight - this.rp.panY;
-    }
-
 }

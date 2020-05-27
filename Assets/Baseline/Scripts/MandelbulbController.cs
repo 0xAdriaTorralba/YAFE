@@ -9,11 +9,14 @@ public class MandelbulbController : MonoBehaviour
     private Camera mandelbulbCamera;
     private Slider sliderDegree; 
 
+    private TextMeshProUGUI textDegree;
+
     private RaymarchGeneric raymarching;
 
     void Awake(){
         mandelbulbCamera = GetComponent<Camera>();
         sliderDegree = GameObject.FindGameObjectWithTag("SliderDegree").GetComponent<Slider>();
+        textDegree = GameObject.Find("Degree Text").GetComponent<TextMeshProUGUI>();
         raymarching = GetComponent<RaymarchGeneric>();
     }
 
@@ -26,6 +29,7 @@ public class MandelbulbController : MonoBehaviour
     private void SliderValueChanged(Slider slider){
         if (string.Equals(slider.tag, "SliderDegree")){
             raymarching.power = (int) slider.value;
+            textDegree.text = (int) slider.value + "";
         }
     }
 
