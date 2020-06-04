@@ -23,6 +23,15 @@ public class RaymarchGeneric : SceneViewFilter
     [Range (2, 20)]
     public int power = 2;
 
+    [Range (1, 3)]
+    public int type = 1;
+
+    [Range(20, 300)]
+    public int maxsteps = 20;
+    
+    [Range(1e-6f, 1e-2f)]
+    public float minimumDistance = 1e-12f;
+
     public Material EffectMaterial
     {
         get
@@ -115,6 +124,11 @@ public class RaymarchGeneric : SceneViewFilter
 
         EffectMaterial.SetFloat("_DrawDistance", _RaymarchDrawDistance);
         EffectMaterial.SetFloat("_Power", power);
+        EffectMaterial.SetInt("_type", type);
+        EffectMaterial.SetInt("maxstep", maxsteps);
+        EffectMaterial.SetFloat("MinimumDistance", minimumDistance);
+
+
 
         if(EffectMaterial.IsKeywordEnabled("DEBUG_PERFORMANCE") != _DebugPerformance) {
             if(_DebugPerformance)

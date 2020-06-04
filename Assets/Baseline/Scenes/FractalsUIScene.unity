@@ -4149,8 +4149,8 @@ MonoBehaviour:
   GOpercentage: {fileID: 1924247658}
   reZ: 0
   imZ: 0
-  iters: 100
-  threshold: 100
+  iters: 500
+  threshold: 1000
   tol: 0.00001
 --- !u!114 &209585141
 MonoBehaviour:
@@ -16341,7 +16341,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 758926843}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 94, z: -26646.83}
+  m_LocalPosition: {x: 0, y: 94, z: -26653.1}
   m_LocalScale: {x: 268.26083, y: 268.26083, z: 268.26083}
   m_Children: []
   m_Father: {fileID: 1102367205}
@@ -16360,12 +16360,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SunLight: {fileID: 2142655447}
-  _EffectShader: {fileID: 4800000, guid: 09742a9e52e9516488b1cfc71d0e443b, type: 3}
+  _EffectShader: {fileID: 4800000, guid: 093a0c945b5184a958e3379c55ba5855, type: 3}
   _MaterialColorRamp: {fileID: 0}
   _PerfColorRamp: {fileID: 0}
   _RaymarchDrawDistance: 1000
   _DebugPerformance: 0
   power: 2
+  type: 1
+  maxsteps: 100
+  minimumDistance: 0.0004
 --- !u!114 &758926846
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16431,8 +16434,8 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 987.7
-  field of view: 60
-  orthographic: 1
+  field of view: 50
+  orthographic: 0
   orthographic size: 2.3670993
   m_Depth: -1
   m_CullingMask:
@@ -22994,7 +22997,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1102367205
 RectTransform:
   m_ObjectHideFlags: 0
@@ -26975,7 +26978,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -27381,7 +27384,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1288903585
 RectTransform:
   m_ObjectHideFlags: 0
@@ -36007,6 +36010,8 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Sierpinski Tetrahedron
       m_Image: {fileID: 0}
+    - m_Text: Menger Sponge
+      m_Image: {fileID: 0}
     - m_Text: Others
       m_Image: {fileID: 0}
   m_OnValueChanged:
@@ -37479,7 +37484,7 @@ MonoBehaviour:
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1270}
-  m_ScreenMatchMode: 1
+  m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -40001,7 +40006,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 0.10764508, g: 0.20069426, b: 0.38679248, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -43456,7 +43461,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

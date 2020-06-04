@@ -61,9 +61,17 @@
             float2 w = (IN.uv_MainTex - 0.5) * _Zoom.xy * float2(1, _Aspect) - _Pan.xy;
             const float r = _Threshold;
             int m = 0;
-            float2 epsilon = float2(0.0, 0.0);
+            float2 epsilon = float2(50.0, 50.0);
             float2 aux = float2(0.0, 0.0);
-            while (m < _Iterations && length(epsilon) < _Threshold){
+            bool orbitFound = false;
+            float4 color;
+            //float tol = _Zoom.x / 1e5;
+            float tol = 1e-5;
+            while 
+            (
+                m < _Iterations && 
+                !orbitFound
+            ){
                 dv = float2(
                     _Degree * v.x * dv.x,
                     _Degree * v.y * dv.y
@@ -72,45 +80,37 @@
                     v.x * v.x - v.y * v.y, 
                     v.x * v.y * 2)
                 + c;
-                aux = float2(dv.x - 1, dv.y);
-                if (length(aux) > 1e-12){
+                if (abs(v.x) > 1000 && abs(v.y) > 1000){
+                    color = float4(sin(m/4), sin(m/5), sin(m/7), 1) / 4 + 0.75;
+                    break;
+                }
+                aux = float2(dv.x - 1.0, dv.y);
+                if (abs(aux.x) > 1e-12){
                     epsilon = float2(
                         ((w.x - v.x) * aux.x + (w.y - v.y) * aux.y) / (aux.x * aux.x - aux.y * aux.y),
                         ((w.y - v.y) * aux.x - (w.x - v.x) * aux.y) / (aux.x * aux.x - aux.y * aux.y)
                     );
                 }else{
+                    continue;
+                }
+
+                if ((abs(epsilon.x) < tol) && (abs(epsilon.y) < tol)){
+                    orbitFound = true;
                     break;
                 }
                 m++;
   
             }
 
-            float4 color;
-            if (_Colormap == 1){
-                if (m == _Iterations){
-                    color = float4(0, 0, 0, 1);
-                }else{
-                    color = float4(sin(m/4), sin(m/5), sin(m/7), 1) / 4 + 0.75;
-                }
+
+            if (orbitFound && m > 5){
+                color = float4(0, 0, 0, 1);
+            }else{
+                //color = float4(254/255.0f, 237/255.0f, 174/255.0f, 1.0f);
+                color = float4(1, 1, 1, 1);
             }
-            if (_Colormap == 2){
-                if (m == _Iterations){
-                    color = float4(0, 0, 0, 1);
-                }else{
-                    color = float4(cos(m/4), cos(m/5), cos(m/7), 1) / 4 + 0.75;
-                }
-            }     
-            if (_Colormap == 3){
-                if (m == _Iterations){
-                    color = float4(0, 0, 0, 1);
-                }else{
-                    color = float4(tan(m/4), tan(m/5), tan(m/7), 1) / 4 + 0.75;
-                }
-            }       
 
             o.Albedo = color;
-            //o.Emission = color;
-            // Metallic and smoothness come from slider variables
             o.Alpha = color.a;
         }
         ENDCG

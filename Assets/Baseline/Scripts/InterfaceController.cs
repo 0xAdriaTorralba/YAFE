@@ -453,11 +453,22 @@ public class InterfaceController : MonoBehaviour
         }
     }
 
+    private void ResetInputFieldsJulia(){
+        inputFields[3].text = "" + 2.0.ToString(format);
+        inputFields[4].text = "" + 0.0.ToString(format);
+        inputFields[5].text = "" + 0.0.ToString(format);
+        previousValues[3] = "" + 2.0.ToString(format);
+        previousValues[4] = "" + 0.0.ToString(format);
+        previousValues[5] = "" + 0.0.ToString(format);
+    }
+
 
     // Update is called once per frame
     void Update()
     {
         if(Input.GetMouseButtonDown(0) && clMandelbrot.getIsPointerIn()){
+            fractalJulia.ResetRenderParameters();
+            ResetInputFieldsJulia();
             fractalJulia.StartDraw(rezM, imzM);
             realPartJulia.text = rezM + "";
             imaginaryPartJulia.text = imzM + "";
@@ -469,7 +480,6 @@ public class InterfaceController : MonoBehaviour
             }else{
                 ZoomInFractal(fractalMandelbrot, rezM, imzM);
             }
-
         }
 
         if(Input.GetMouseButtonDown(1) && clJulia.getIsPointerIn()){

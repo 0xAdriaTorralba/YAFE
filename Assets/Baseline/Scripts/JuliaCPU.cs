@@ -131,6 +131,14 @@ public class JuliaCPU : FractalCPU
         }
     }
 
+    public void ResetRenderParameters(){
+        rp.xmax = 2.0;
+        rp.ymax = 2.0;
+        rp.panX = 0.0;
+        rp.panY = 0.0;
+
+    }
+
     public override void OnEnable(){
         //Draw(reZ, imZ);
     }
@@ -381,7 +389,7 @@ public class JuliaCPU : FractalCPU
 
     private Color ComputeConvergenceHenriksenColor(int x, int y, double reZ, double imZ){
         Complex z, w, dz, epsilon, c;
-        bool escaped;
+        bool orbitFound;
         int i;
         lock(lockObject){
             rp.viewPortX = rp.xmin + ((double) x / rp.pwidth) * rp.viewPortWidth + rp.panX;
@@ -390,45 +398,41 @@ public class JuliaCPU : FractalCPU
             w = new Complex(rp.viewPortX, rp.viewPortY);
             dz = new Complex(1.0, 0.0);
             epsilon = new Complex(50.0, 50.0);
-            escaped = false;
+            orbitFound = false;
             c = new Complex(reZ, imZ);
             i = 0;
+            tol = rp.viewPortWidth / (double)1e4;
         }
         while (
                 i < iters && 
-                //(Math.Abs(epsilon.Real) > tol && Math.Abs(epsilon.Imaginary) > tol) &&
-                !escaped
+                !orbitFound
             ){
             dz = fp.degree * Complex.Pow(z, fp.degree - 1) * dz;
             z = Complex.Pow(z, fp.degree) + c;
-            // if (Complex.Abs(z) > threshold){
-            //     escaped = true;
-            // }
-            if (Complex.Abs(dz - 1) > 1e-8){
-                epsilon = (w - z) / (dz - 1.0);
-            }else{
+
+            if (Complex.Abs(z) > threshold){
                 return PickColor(i);
             }
+
+            if (Complex.Abs(dz - 1) > 1e-12){
+                epsilon = (w - z) / (dz - 1.0);
+            }else{
+                continue;
+                
+            }
             if ((Math.Abs(epsilon.Real) < tol && Math.Abs(epsilon.Imaginary) < tol)){
-                escaped = true;
+                orbitFound = true;
+                break;
             }
             i++;
 
         }
-        //return PickColor(i);
-        if (escaped){
-            // if (i == iters){
-            //     return Color.red;
-            // }else{
-            //     return Color.black;
-            // }
-            if (i==iters){
-                return Color.green;
-            }else{
-                return Color.black;
-            }
+
+        // condition i > 5 (for instance) in order to avoid find fixed points inside the filled Julia set.
+        if (orbitFound && i > 5){
+            return Color.black;
         }else{
-            return PickColor(i);
+            return new Color(184/255.0f, 28/255.0f, 74/255.0f);
         }
     }
 
@@ -444,7 +448,6 @@ public class JuliaCPU : FractalCPU
         }
         while (Complex.Abs(z) < fp.threshold && i < fp.maxIters){
             z = Complex.Pow(z, fp.degree) + c;
-            //z = -4 * Complex.Pow(z, fp.degree) * (z - 1);
             i++;
         }
         return i;

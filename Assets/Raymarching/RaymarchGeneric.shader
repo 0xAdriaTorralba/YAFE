@@ -138,35 +138,7 @@ Shader "Custom/RaymarchGeneric"
 			}
 
 
-			float2 mandelbulbDE(float3 pos){
-				float3 z = pos;
-				float dr = 1.0f;
-				float r = 0.0f;
-				int maxIters = 64;
-				int i;
-				for (i = 0; i < maxIters; i++){
-					r = length(z);
-					if (r > 5){
-						break;
-					}
-					// convert to polar coordinates
-					float theta = acos(z.z / r);
-					float phi = atan(z.y / z.x);
-					dr = pow(r, _Power - 1.0) * _Power * dr + 1.0f;
-
-					// scale and rotate the point
-					float zr = pow(r, _Power);
-					theta = theta * _Power;
-					phi = phi * _Power;
-
-					// convert back to cartesian coordinates
-					z  = zr * float3(sin(theta) * cos(phi), 
-									 sin(phi) * sin(theta), 
-									 cos(theta));
-					z += pos;
-				}
-				return float2(0.5f * log(r) * r/dr, i);
-			}
+			
 
 			// This is the distance field function.  The distance field represents the closest distance to the surface
 			// of any object we put in the scene.  If the given point (point p) is inside of an object, we return a
@@ -219,7 +191,7 @@ float stime, ctime;
   	p.z = -s * q.x + c * q.z; 
  }  
 
-float pixel_size = 0.0;
+float pixel_size = 0.5;
 
 /* 
 
@@ -293,21 +265,22 @@ float3 nor( in float3 pos )
 
 float4 intersect( in float3 ro, in float3 rd )
 {
-    float t = .001;
+    float t = .5;
     float res_t = 0.0;
     float res_d = 1000.0;
     float3 c, res_c;
-    float max_error = 1000.0;
+    float max_error = 100.0;
 	float d = 1.0;
     float pd = 100.0;
     float os = 0.0;
     float step = 0.0;
-    float error = 1000.0;
+    float error = 100.0;
     
-    for( int i=0; i<30; i++ )
+    for( int i=0; i<10; i++ )
     {
         if( error < pixel_size*0.5 || t > 20.0 )
         {
+			break;
         }
         else{  // avoid broken shader on windows
         
@@ -341,145 +314,69 @@ float4 intersect( in float3 ro, in float3 rd )
 	if( t>20.0/* || max_error > pixel_size*/ ) res_t=-1.0;
     return float4(res_t, res_c.y, res_c.z, 1.0);
 }
+			float2 mandelbulbDE(float3 pos){
+				float3 z = pos;
+				float dr = 1.0f;
+				float r = 0.0f;
+				int maxIters = 64;
+				int i;
+				for (i = 0; i < maxIters; i++){
+					r = length(z);
+					if (r > 5){
+						break;
+					}
+					// convert to polar coordinates
+					float theta = acos(z.z / r);
+					float phi = atan(z.y / z.x);
+					dr = pow(r, _Power - 1.0) * _Power * dr + 1.0f;
 
-//  void mainImage( out float4 fragColor, in float2 fragCoord ) 
-//  { 
-//     float2 q=fragCoord.xy/iResolution.xy; 
-//  	float2 uv = -1.0 + 2.0*q; 
-//  	uv.x*=iResolution.x/iResolution.y; 
-     
-//     pixel_size = 1.0/(iResolution.x * 3.0);
-// 	// camera
-//  	stime=0.7+0.3*sin(iTime*0.4); 
-//  	ctime=0.7+0.3*cos(iTime*0.4); 
+					// scale and rotate the point
+					float zr = pow(r, _Power);
+					theta = theta * _Power;
+					phi = phi * _Power;
 
-//  	float3 ta=float3(0.0,0.0,0.0); 
-// 	float3 ro = float3(0.0, 3.*stime*ctime, 3.*(1.-stime*ctime));
-
-//  	float3 cf = normalize(ta-ro); 
-//     float3 cs = normalize(cross(cf,float3(0.0,1.0,0.0))); 
-//     float3 cu = normalize(cross(cs,cf)); 
-//  	float3 rd = normalize(uv.x*cs + uv.y*cu + 3.0*cf);  // transform from view to world
-
-//     float3 sundir = normalize(float3(0.1, 0.8, 0.6)); 
-//     float3 sun = float3(1.64, 1.27, 0.99); 
-//     float3 skycolor = float3(0.6, 1.5, 1.0); 
-
-// 	float3 bg = exp(uv.y-2.0)*float3(0.4, 1.6, 1.0);
-
-//     float halo=clamp(dot(normalize(float3(-ro.x, -ro.y, -ro.z)), rd), 0.0, 1.0); 
-//     float3 col=bg+float3(1.0,0.8,0.4)*pow(halo,17.0); 
-
-
-//     float t=0.0;
-//     float3 p=ro; 
-	 
-// 	float3 res = intersect(ro, rd);
-// 	 if(res.x > 0.0){
-// 		   p = ro + res.x * rd;
-//            float3 n=nor(p); 
-//            float shadow = softshadow(p, sundir, 10.0 );
-
-//            float dif = max(0.0, dot(n, sundir)); 
-//            float sky = 0.6 + 0.4 * max(0.0, dot(n, float3(0.0, 1.0, 0.0))); 
-//  		   float bac = max(0.3 + 0.7 * dot(float3(-sundir.x, -1.0, -sundir.z), n), 0.0); 
-//            float spe = max(0.0, pow(clamp(dot(sundir, reflect(rd, n)), 0.0, 1.0), 10.0)); 
-
-//            float3 lin = 4.5 * sun * dif * shadow; 
-//            lin += 0.8 * bac * sun; 
-//            lin += 0.6 * sky * skycolor*shadow; 
-//            lin += 3.0 * spe * shadow; 
-
-// 		   res.y = pow(clamp(res.y, 0.0, 1.0), 0.55);
-// 		   float3 tc0 = 0.5 + 0.5 * sin(3.0 + 4.2 * res.y + float3(0.0, 0.5, 1.0));
-//            col = lin *float3(0.9, 0.8, 0.6) *  0.2 * tc0;
-//  		   col=mix(col,bg, 1.0-exp(-0.001*res.x*res.x)); 
-//     } 
-
-//     // post
-//     col=pow(clamp(col,0.0,1.0),float3(0.45)); 
-//     col=col*0.6+0.4*col*col*(3.0-2.0*col);  // contrast
-//     col=mix(col, float3(dot(col, float3(0.33))), -0.5);  // satuation
-//     col*=0.5+0.5*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),0.7);  // vigneting
-//  	fragColor = float4(col.xyz, smoothstep(0.55, .76, 1.-res.x/5.)); 
-//  }
-
-
-			float4 trace(float3 from, float3 direction) {
-				float totalDistance = 0.0f;
-				float h = 1e-2;
-				float3 aux1, aux2;
-				float normal_x, normal_y, normal_z;
-				float3 normal;
-				float4 color;
-				const int maxstep = 64;
-				float MinimumDistance = 1e-2;
-				float3 t = 0;
-				float light;
-				float n;
-				int i = 0;
-				float2 res;
-
-				float view_radius = 5.;
-				float epsilon = 0.0002;
-
-				float depth = 0.;
-				float dist = 0;
-				i = 0;
-				while (depth < view_radius && dist > epsilon){
-					t = from + depth * direction;
-					dist = mandelbulbDE(t);
-					depth += dist;
-					i++;
+					// convert back to cartesian coordinates
+					z  = zr * float3(sin(theta) * cos(phi), 
+									 sin(phi) * sin(theta), 
+									 cos(theta));
+					z += pos;
 				}
-
-				// for (i = 0; i < maxstep; i++) {
-				// 	t = from + totalDistance * direction;
-				// 	res = mandelbulbDE(t); // res.x = distance, res.y = iter on el fractal 'convergeix'
-				// 	totalDistance += res.x;
-					
-				// 	//if (res.y == 64) break; // 64 \equiv maxiters de mandelbulbDE de NO convergir
-				// 	if (res.x < MinimumDistance) {
-
-				// 		break;
-				// 	}
-				// 	// if (res.y == 64){
-				// 	// 	color = float4(0, 0, 0, 1);
-				// 	// }else{
-				// 	// 	color = float4(sin(res.y/4), sin(res.y/5), sin(res.y/7), 1) / 4 + 0.75;
-         		// 	// }	
-
-				// }
+				return float2(0.5f * log(r) * r/dr, i);
+			}
 
 
-				//return color;
-				// TODO posar color com a 2D (usant el iterat)
-				// aux1 = float3(t.x+h, t.y, t.z);
-				// aux2 = float3(t.x-h, t.y, t.z);
-				// normal_x = ( mandelbulbDE(aux1) - mandelbulbDE(aux2) ) / ( 2*h );
+			float2 trace(float3 from, float3 direction) {
+				int maxstep = 64;
+				float marchingStep = 0.3;
+				float minimumStep = 1e-1;
+				float t = 0.0;
+				float c = 0.0;
+				float2 dist;
+				float path;
+				for (int i = 0; i < maxstep; i++){
+					path = from + (t * direction);
+					dist = mandelbulbDE(t);
+					t += marchingStep * dist.x;
+					c += dist.y;
+					if (dist.y < minimumStep){ break; }
+				}
+				return float2(t, c);
 
-				// aux1 = float3(t.x, t.y+h, t.z);
-				// aux2 = float3(t.x-h, t.y-h, t.z);
-				// normal_y = ( mandelbulbDE(aux1) - mandelbulbDE(aux2) ) / ( 2*h );
+				// return float4(i, i, i, 1.0);
+				// color = float4(1.0-(float(res.y)/float(maxstep))+normal_x, 1.0-(float(res.y)/float(maxstep))+normal_y, 1.0-(float(res.y)/float(maxstep))+normal_z, 1.0);
+				// color = float4(1.0, 1.0, 1.0, 0.0) + color;
+				// color = color * (1.0 / 3.0);
+				// color.w = 1.0;
+				// return color;
+			}
 
-				// aux1 = float3(t.x, t.y, t.z+h);
-				// aux2 = float3(t.x, t.y, t.z-h);
-				// normal_z = ( mandelbulbDE(aux1) - mandelbulbDE(aux2) ) / ( 2*h );
-
-				// normal = float3(normal_x, normal_y, normal_z);
-
-				// normal = normalize(normal);
-
-				//return 1.0 - float(i) /float(maxstep);
-				//if (i == maxstep){ return float4(0.0, 0.0, 0.0, 1.0);}
-				//return float4(1.0-float(i)/float(maxstep), 1.0-float(i)/float(maxstep), 1.0-float(i)/float(maxstep), 1.0);
-				return float4(i, i, i, 1.0);
-				color = float4(1.0-(float(res.y)/float(maxstep))+normal_x, 1.0-(float(res.y)/float(maxstep))+normal_y, 1.0-(float(res.y)/float(maxstep))+normal_z, 1.0);
-				color = float4(1.0, 1.0, 1.0, 0.0) + color;
-				color = color * (1.0 / 3.0);
-				color.w = 1.0;
-				return color;
-				//return fixed4(tex2D(_ColorRamp_Material, float2(t.y,0)).xyz * light, 1);
+			// cosine based palette, 4 vec3 params
+			float3 cosineColor( in float t, in float3 a, in float3 b, in float3 c, in float3 d )
+			{
+				return a + b*cos( 6.28318*(c*t+d) );
+			}
+			float3 palette (float t) {
+				return cosineColor( t, float3(0.5,0.5,0.5),float3(0.5,0.5,0.5),float3(0.01,0.01,0.01),float3(0.00, 0.15, 0.20) );
 			}
 
 
@@ -572,50 +469,50 @@ float4 intersect( in float3 ro, in float3 rd )
 
 				fixed3 col = tex2D(_MainTex,i.uv);
 
-				#if defined (DEBUG_PERFORMANCE)
-				fixed4 add = raymarch_perftest(ro, rd, depth);
-				#else
-				fixed4 add = intersect(ro.xyz, rd.xyz);
-				    float3 sundir = normalize(float3(0.1, 0.8, 0.6)); 
-    				float3 sun = float3(1.64, 1.27, 0.99); 
-    				float3 skycolor = float3(0.6, 1.5, 1.0); 
-					//float2 uv = -1.0 + 2.0*q;
-					float4 fragColor;
-				 	float3 bg = exp(1-2.0)*float3(0.4, 1.6, 1.0);
-					 if(add.x > 0.0){
-						float3 p = ro.xyz;
-						p = ro.xyz + add.x * rd.xyz;
-						float3 n=nor(p); 
-						float shadow = softshadow(p, sundir, 10.0 );
+				fixed2 add = trace(ro.xyz, rd.xyz);
+				float fog = 1.0 / (1.0 + add.x * add.x * 0.1);
+				float3 fc = float3(fog, fog, fog);
+				return fixed4(palette(add.y)*fog, 1.0);
+				//return fixed4(col*(1.0 - add.w) + add.xyz * add.w,1.0);
 
-						float dif = max(0.0, dot(n, sundir)); 
-						float sky = 0.6 + 0.4 * max(0.0, dot(n, float3(0.0, 1.0, 0.0))); 
-						float bac = max(0.3 + 0.7 * dot(float3(-sundir.x, -1.0, -sundir.z), n), 0.0); 
-						float spe = max(0.0, pow(clamp(dot(sundir, reflect(rd, n)), 0.0, 1.0), 10.0)); 
+				//     float3 sundir = normalize(float3(0.1, 0.8, 0.6)); 
+    			// 	float3 sun = float3(1.64, 1.27, 0.99); 
+    			// 	float3 skycolor = float3(0.6, 1.5, 1.0); 
+				// 	//float2 uv = -1.0 + 2.0*q;
+				// 	float4 fragColor;
+				//  	float3 bg = exp(1-2.0)*float3(0.4, 1.6, 1.0);
+				// 	 if(add.x > 0.0){
+				// 		float3 p = ro.xyz;
+				// 		p = ro.xyz + add.x * rd.xyz;
+				// 		float3 n=nor(p); 
+				// 		float shadow = softshadow(p, sundir, 10.0 );
 
-						float3 lin = 4.5 * sun * dif * shadow; 
-						lin += 0.8 * bac * sun; 
-						lin += 0.6 * sky * skycolor*shadow; 
-						lin += 3.0 * spe * shadow; 
+				// 		float dif = max(0.0, dot(n, sundir)); 
+				// 		float sky = 0.6 + 0.4 * max(0.0, dot(n, float3(0.0, 1.0, 0.0))); 
+				// 		float bac = max(0.3 + 0.7 * dot(float3(-sundir.x, -1.0, -sundir.z), n), 0.0); 
+				// 		float spe = max(0.0, pow(clamp(dot(sundir, reflect(rd, n)), 0.0, 1.0), 10.0)); 
 
-						add.y = pow(clamp(add.y, 0.0, 1.0), 0.55);
-						float3 tc0 = 0.5 + 0.5 * sin(3.0 + 4.2 * add.y + float3(0.0, 0.5, 1.0));
-						col = lin *float3(0.9, 0.8, 0.6) *  0.2 * tc0;
-						col=lerp(col,bg, 1.0-exp(-0.001*add.x*add.x)); 
-					} 
+				// 		float3 lin = 4.5 * sun * dif * shadow; 
+				// 		lin += 0.8 * bac * sun; 
+				// 		lin += 0.6 * sky * skycolor*shadow; 
+				// 		lin += 3.0 * spe * shadow; 
 
-					// post
-					col=pow(clamp(col, 0.0, 1.0), float3(0.45, 0.45, 0.45)); 
-					col=col*0.6+0.4*col*col*(3.0-2.0*col);  // contrast
-					col=lerp(col, float3(dot(col, float3(0.33, 0.33, 0.33)), dot(col, float3(0.33, 0.33, 0.33)), dot(col, float3(0.33, 0.33, 0.33))), -0.5);  // satuation
-					//col*=0.5+0.5*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),0.7);  // vigneting
-					fragColor = float4(col.xyz, smoothstep(0.55, .76, 1.-add.x/5.)); 
-					return fragColor;
-				// TODO normalitzar
-				#endif
+				// 		add.y = pow(clamp(add.y, 0.0, 1.0), 0.55);
+				// 		float3 tc0 = 0.5 + 0.5 * sin(3.0 + 4.2 * add.y + float3(0.0, 0.5, 1.0));
+				// 		col = lin *float3(0.9, 0.8, 0.6) *  0.2 * tc0;
+				// 		col=lerp(col,bg, 1.0-exp(-0.001*add.x*add.x)); 
+				// 	} 
+
+				// 	// post
+				// 	col=pow(clamp(col, 0.0, 1.0), float3(0.45, 0.45, 0.45)); 
+				// 	col=col*0.6+0.4*col*col*(3.0-2.0*col);  // contrast
+				// 	col=lerp(col, float3(dot(col, float3(0.33, 0.33, 0.33)), dot(col, float3(0.33, 0.33, 0.33)), dot(col, float3(0.33, 0.33, 0.33))), -0.5);  // satuation
+				// 	//col*=0.5+0.5*pow(16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y),0.7);  // vigneting
+				// 	fragColor = float4(col.xyz, smoothstep(0.55, .76, 1.-add.x/5.)); 
+				// 	return fragColor;
+				// // TODO normalitzar
 
 				// Returns final color using alpha blending
-				return fixed4(col*(1.0 - add.w) + add.xyz * add.w,1.0);
 			}
 			ENDCG
 		}
