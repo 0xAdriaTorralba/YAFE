@@ -31,6 +31,7 @@ TagManager:
   - SmoothToggle
   - MandelbrotQuad
   - JuliaQuad
+  - Mandelbulb
   layers:
   - Default
   - TransparentFX

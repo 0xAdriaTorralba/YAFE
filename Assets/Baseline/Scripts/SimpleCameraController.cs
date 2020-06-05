@@ -108,6 +108,11 @@ namespace UnityTemplateProjects
         
         void Update()
         {
+            
+            //GetComponent<Camera>().transform.RotateAround(new Vector3(0, 94, -26653), Vector3.up, 30*Time.deltaTime);
+            m_TargetCameraState.yaw -= Time.deltaTime;
+            m_TargetCameraState.Translate(Vector3.right * Time.deltaTime/20.0f);
+
             // Exit Sample  
             if (Input.GetKey(KeyCode.Escape))
             {
