@@ -51,6 +51,7 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
         if (fractal is JuliaGPU){
             fractal = (JuliaGPU) fractal;
         }
+
         dropdownFormatMandelbrot = GameObject.Find("Format Mandelbrot Dropdown").GetComponent<TMP_Dropdown>();
         dropdownFormatJulia = GameObject.Find("Format Julia Dropdown").GetComponent<TMP_Dropdown>();
 
@@ -125,7 +126,7 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
             if (fractal is JuliaGPU){
                 juliaGPU.SetActive(true);
             }
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.1f);
             texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
         }
         if (fractal is FractalCPU){
@@ -237,7 +238,7 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
             if (fractal is JuliaGPU){
                 juliaGPU.SetActive(true);
             }
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.1f);
             texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
         }
         if (fractal is FractalCPU){
@@ -330,7 +331,8 @@ public class ExportListener : MonoBehaviour, IPointerDownHandler {
             if (fractal is JuliaGPU){
                 juliaGPU.SetActive(true);
             }
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.1f);
+            
             texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
         }
         if (fractal is FractalCPU){

@@ -12,7 +12,7 @@ public class RaymarchController : SceneViewFilter
 
     [SerializeField]
     [Range (500, 10000)]
-    private float _RaymarchDrawDistance = 40;
+    public float _RaymarchDrawDistance = 40;
     [SerializeField]
     private bool _DebugPerformance = false;
 
@@ -26,6 +26,8 @@ public class RaymarchController : SceneViewFilter
 
     [Range(20, 300)]
     public int maxsteps = 20;
+
+    public int IFSIters = 2;
     
 
 
@@ -78,6 +80,7 @@ public class RaymarchController : SceneViewFilter
         EffectMaterial.SetFloat("_Power", power);
         EffectMaterial.SetInt("_type", type);
         EffectMaterial.SetInt("maxstep", maxsteps);
+        EffectMaterial.SetInt("_IFSIters", IFSIters);
 
 
         EffectMaterial.SetMatrix("_FrustumCornersES", GetFrustumCorners(CurrentCamera));
@@ -99,7 +102,7 @@ public class RaymarchController : SceneViewFilter
         EffectMaterial.SetFloat("_Power", power);
         EffectMaterial.SetInt("_type", type);
         EffectMaterial.SetInt("maxstep", maxsteps);
-
+        EffectMaterial.SetInt("_IFSIters", IFSIters);
 
         EffectMaterial.SetMatrix("_FrustumCornersES", GetFrustumCorners(CurrentCamera));
         EffectMaterial.SetMatrix("_CameraInvViewMatrix", CurrentCamera.cameraToWorldMatrix);

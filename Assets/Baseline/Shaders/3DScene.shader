@@ -42,6 +42,7 @@ Shader "Fractals/3DScene"
 			uniform int _type;
 
 			uniform int _DrawDistance;
+			uniform int _IFSIters;
 
 			struct appdata
 			{
@@ -106,11 +107,52 @@ Shader "Fractals/3DScene"
 			// 	return 0.5*r*log(r)/length(gradient);
 			// }
 
-			float2 DE(float3 z)
+			float sdBox( float3 p, float3 b )
+			{
+			float3 d = abs(p) - b;
+			return min(max(d.x,max(d.y,d.z)),0.0) +
+					length(max(d,0.0));
+			}
+
+			float2 MengerSponge( in float3 p )
+			{
+				p.xy = fmod(p.xy, 2.44) - 1.22;
+				
+			float d = sdBox(p,float3(1.0, 1.0, 1.0));
+			float2 res = float2( d, 1.0 );
+
+			float s = 1.0;
+			for( int m=0; m < _IFSIters; m++ )
+			{
+				/*p = vRotateX(p, rand(float(m)) * M_PI * 2.0);
+				p = vRotateY(p, rand(float(m + Iterations)) * M_PI * 2.0);
+				p = vRotateY(p, rand(float(m + Iterations * 2)) * M_PI * 2.0);*/
+				
+				float3 a = fmod( p*s, 2.0 )-1.0;
+				s *= 3.0;
+				float3 r = abs(1.0 - 3.0*abs(a));
+
+				float da = max(r.x,r.y);
+				float db = max(r.y,r.z);
+				float dc = max(r.z,r.x);
+				float c = (min(da,min(db,dc))-1.0)/s;
+
+				if( c>d )
+				{
+					d = c;
+					res = float2( d, 0.2*da*db*dc);//, (1.0+float(m))/4.0 );
+				}
+			}
+
+			return res;
+			}
+
+
+			float2 Sierpinski(float3 z)
 
 			{				
 				float Scale = 2.0f;
-				int Iterations = 15;
+				int Iterations = _IFSIters;
 				float3 a1 = float3(1,1,1);
 				float3 a2 = float3(-1,-1,1);
 				float3 a3 = float3(1,-1,-1);
@@ -192,10 +234,10 @@ Shader "Fractals/3DScene"
 						res = mandelbulbDE(t); // res.x = distance, res.y = iter on el fractal 'convergeix'
 					}
 					if (_type == 2){
-						res = DE(t);
+						res = Sierpinski(t);
 					}
 					if (_type == 3){
-						res = sphereDE(t);
+						res = MengerSponge(t);
 					}
 					totalDistance += res.x;
 					
