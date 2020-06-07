@@ -142,7 +142,6 @@ public class FractalGPU : Fractal
     }
 
     public void UpdateZoom(float zoom){
-        // This is attributed are used by CoordinatesListenerScript.
         this.rp.xmax = zoom;
         this.rp.xmin = -zoom;
         this.rp.ymax = zoom;
@@ -171,6 +170,16 @@ public class FractalGPU : Fractal
 
     private void UpdatePanY(float panY){
         this.rp.panY = panY;
+    }
+
+    // Due to some shaders stuff, it is needed to substract (-) the pan instead of add them to correctly
+    // visualise the coordinates.
+    public new double GetViewPortX(double x){
+        return rp.xmin + ((double) x / rp.pwidth) * rp.viewPortWidth - rp.panX;
+    }
+
+    public new double GetViewPortY(double y){
+        return rp.ymin + ((double) y / rp.pheight) * rp.viewPortHeight - rp.panY;
     }
 
 }

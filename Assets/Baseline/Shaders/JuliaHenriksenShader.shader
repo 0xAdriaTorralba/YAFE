@@ -65,40 +65,43 @@
             float2 aux = float2(0.0, 0.0);
             bool orbitFound = false;
             float4 color;
-            //float tol = _Zoom.x / 1e5;
-            float tol = 1e-5;
+            float tol = _Zoom.x / 1e5;
+            //float tol = 1e-7;
             while 
-            (
-                m < _Iterations && 
-                !orbitFound
-            ){
-                dv = float2(
-                    _Degree * v.x * dv.x,
-                    _Degree * v.y * dv.y
-                );
-                v = float2(
-                    v.x * v.x - v.y * v.y, 
-                    v.x * v.y * 2)
-                + c;
-                if (abs(v.x) > 1000 && abs(v.y) > 1000){
-                    color = float4(sin(m/4), sin(m/5), sin(m/7), 1) / 4 + 0.75;
-                    break;
-                }
-                aux = float2(dv.x - 1.0, dv.y);
-                if (abs(aux.x) > 1e-12){
-                    epsilon = float2(
-                        ((w.x - v.x) * aux.x + (w.y - v.y) * aux.y) / (aux.x * aux.x - aux.y * aux.y),
-                        ((w.y - v.y) * aux.x - (w.x - v.x) * aux.y) / (aux.x * aux.x - aux.y * aux.y)
+                (
+                    m < _Iterations && 
+                    !orbitFound
+                ){
+                    dv = float2(
+                        _Degree * v.x * dv.x,
+                        _Degree * v.y * dv.y
                     );
-                }else{
-                    continue;
-                }
+                    v = float2(
+                        v.x * v.x - v.y * v.y, 
+                        v.x * v.y * 2.0)
+                    + c;
+                    if (abs(v.x) > 1000 && abs(v.y) > 1000){
+                        //color = float4(sin(m/4), sin(m/5), sin(m/7), 1) / 4 + 0.75;
+                        color = float4(1,1,1,1);
+                        o.Albedo = color;
+                        o.Alpha = color.a;
+                        return;
+                    }
+                    aux = float2(dv.x - 1.0, dv.y);
+                    if (abs(aux.x) > 1e-8){
+                        epsilon = float2(
+                            ((w.x - v.x) * aux.x + (w.y - v.y) * aux.y) / (float)(aux.x * aux.x - aux.y * aux.y),
+                            ((w.y - v.y) * aux.x - (w.x - v.x) * aux.y) / (float)(aux.x * aux.x - aux.y * aux.y)
+                        );
+                    }else{
+                        continue;
+                    }
 
-                if ((abs(epsilon.x) < tol) && (abs(epsilon.y) < tol)){
-                    orbitFound = true;
-                    break;
-                }
-                m++;
+                    if ((abs(epsilon.x) < tol) && (abs(epsilon.y) < tol)){
+                        orbitFound = true;
+                        break;
+                    }
+                    m++;
   
             }
 
@@ -106,8 +109,7 @@
             if (orbitFound && m > 5){
                 color = float4(0, 0, 0, 1);
             }else{
-                //color = float4(254/255.0f, 237/255.0f, 174/255.0f, 1.0f);
-                color = float4(1, 1, 1, 1);
+                color = float4(184/255.0, 28/255.0, 74/255.0, 1.0);
             }
 
             o.Albedo = color;

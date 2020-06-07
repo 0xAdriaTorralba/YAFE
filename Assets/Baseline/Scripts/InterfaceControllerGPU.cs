@@ -182,7 +182,7 @@ public class InterfaceControllerGPU : MonoBehaviour
             RestartFractalJulia();
         }
 
-        if(Input.GetMouseButtonDown(0) && clMandelbrot.getIsPointerIn()){
+        if(Input.GetMouseButton(0) && clMandelbrot.getIsPointerIn()){
             fractalJulia.UpdateSeed((float)rezM, (float)imzM);
             realPartJulia.text = rezM.ToString(format);
             imaginaryPartJulia.text = imzM.ToString(format);

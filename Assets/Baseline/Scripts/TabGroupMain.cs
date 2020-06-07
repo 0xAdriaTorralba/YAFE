@@ -22,16 +22,14 @@ public class TabGroupMain : MonoBehaviour
 
 
     void Awake(){
-        //interfaceController = GameObject.FindGameObjectWithTag("InterfaceController").GetComponent<InterfaceController>();
-
-        
+        //interfaceController = GameObject.FindGameObjectWithTag("InterfaceController").GetComponent<InterfaceController>();   
     }
 
     void Start(){
         ResetPages();
         objectsToSwap[objectsToSwap.Count-1].SetActive(true);
-
     }
+
     public void Suscribe (TabButtonMain button){
         if (tabButtons == null){
             tabButtons = new List<TabButtonMain>();
