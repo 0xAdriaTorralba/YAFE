@@ -39,7 +39,7 @@ public class InterfaceControllerGPU : MonoBehaviour
 
     private List<string> previousValues, previousValuesJulia;
     
-    private bool allowEnter, allowEnterJulia;
+    private bool allowEnter, allowEnterJulia, reverse = false;
 
 
     private double defaultZoom, defaultMovement;
@@ -182,16 +182,11 @@ public class InterfaceControllerGPU : MonoBehaviour
             RestartFractalJulia();
         }
 
-        if(Input.GetMouseButtonDown(0) && clMandelbrot.getIsPointerIn()){
+        if(Input.GetMouseButton(0) && clMandelbrot.getIsPointerIn()){
             fractalJulia.UpdateSeed((float)rezM, (float)imzM);
             realPartJulia.text = rezM.ToString(format);
             imaginaryPartJulia.text = imzM.ToString(format);
         }
-
-
-        // if(Input.GetMouseButtonDown(0) && clJulia.getIsPointerIn()){
-        //     fractalJulia.CalculateImageAndDrawImage(rezJ, imzJ, (int)clJulia.getX(), (int)clJulia.getY());
-        // }
 
 
         if (allowEnterJulia && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))){
@@ -207,6 +202,41 @@ public class InterfaceControllerGPU : MonoBehaviour
         textPanXJ.text = fractalJulia.rp.panX.ToString(format);
         textPanYJ.text = fractalJulia.rp.panY.ToString(format);
         textZoomJ.text = fractalJulia.rp.xmax.ToString(format);
+
+
+         // Input Fields management through Tab and LShifh + Tabs :)
+        if (Input.GetKey(KeyCode.LeftShift)){
+            reverse = true;
+        }else{
+            reverse = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab)) {
+            if (reverse){
+                if (allowEnterJulia){
+                    for (int i = 1; i >= 0; i--){
+                        if (inputFieldsJulia[i].isFocused){
+                            inputFieldsJulia[i].text = previousValuesJulia[i];
+                            inputFieldsJulia[(i-1) % 2].Select();
+                        }else{
+                            inputFieldsJulia[0].text = previousValuesJulia[0];
+                            inputFieldsJulia[1].Select();
+                        }
+                        break;
+                    }
+                }
+            }else{
+                if (allowEnterJulia){
+                    for (int i = 0; i < 2; i++){
+                        if (inputFieldsJulia[i].isFocused){
+                            inputFieldsJulia[(i+1) % 2].Select();
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
 
         
     }

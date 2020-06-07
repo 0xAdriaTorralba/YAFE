@@ -39,7 +39,7 @@ public class InterfaceController : MonoBehaviour
 
     private List<string> previousValues, previousValuesJulia;
     
-    private bool allowEnter, allowEnterJulia, calculateJuliaImages = false;
+    private bool allowEnter, allowEnterJulia, calculateJuliaImages = false, reverse = false;
     private double defaultZoom, defaultMovement;
 
     void Awake()
@@ -72,6 +72,14 @@ public class InterfaceController : MonoBehaviour
         imaginaryPartJulia = GameObject.Find("Complex Number Julia/Input Imaginary Julia").GetComponent<TMP_InputField>();
 
         parallelToggle = GameObject.FindGameObjectWithTag("ParallelToggle").GetComponent<Toggle>();
+        
+        //WebGL does not support CPU Threads at moment, so we need to deactivate this feature :(
+        #if UNITY_WEBGL && !UNITY_EDITOR
+            fractalJulia.rp.parallel = false;
+            fractalMandelbrot.rp.parallel = false;
+            parallelToggle.isOn = false;
+            parallelToggle.interactable = false;
+        #endif
 
         sliderNumImagesJulia = GameObject.Find("Slider Num Images Julia").GetComponent<Slider>();
 
@@ -466,6 +474,7 @@ public class InterfaceController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Choose 'c' value for Julia
         if(Input.GetMouseButtonDown(0) && clMandelbrot.getIsPointerIn()){
             fractalJulia.ResetRenderParameters();
             ResetInputFieldsJulia();
@@ -474,6 +483,7 @@ public class InterfaceController : MonoBehaviour
             imaginaryPartJulia.text = imzM + "";
         }
 
+        // Zoom over Mandelbrot.
         if(Input.GetMouseButtonDown(1) && clMandelbrot.getIsPointerIn()){
             if (Input.GetKey(KeyCode.LeftShift)){
                 ZoomOutFractal(fractalMandelbrot, rezM, imzM);
@@ -482,6 +492,7 @@ public class InterfaceController : MonoBehaviour
             }
         }
 
+        // Zoom over Julia.
         if(Input.GetMouseButtonDown(1) && clJulia.getIsPointerIn()){
             if (Input.GetKey(KeyCode.LeftShift)){
                 ZoomOutFractal(fractalJulia, rezJ, imzJ);
@@ -491,7 +502,7 @@ public class InterfaceController : MonoBehaviour
 
         }
 
-
+        // Rendering Input Fields
         if (allowEnter && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))) {
             StartCoroutine(OnSubmit ());
             allowEnter = false;
@@ -501,13 +512,70 @@ public class InterfaceController : MonoBehaviour
             }
         }
 
+        // Julia c Input Fields
         if (allowEnterJulia && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))){
             StartCoroutine(OnSubmitJulia());
             allowEnterJulia = false;
         }else{
             allowEnterJulia = realPartJulia.isFocused || imaginaryPartJulia.isFocused;
         }
-        
+
+        if (Input.GetKey(KeyCode.LeftShift)){
+            reverse = true;
+        }else{
+            reverse = false;
+        }
+
+        // Input Fields management through Tab and LShifh + Tabs :)
+        if (Input.GetKeyDown(KeyCode.Tab)) {
+            if (reverse){
+                if (allowEnter){
+                    for (int i = 5; i >= 0; i--){
+                        if(inputFields[i].isFocused){
+                            if (i != 0){
+                                inputFields[i].text = previousValues[i];
+                                inputFields[(i-1) % 6].Select();
+                            }else{
+                                inputFields[0].text = previousValues[0];
+                                inputFields[5].Select();
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (allowEnterJulia){
+                    for (int i = 1; i >= 0; i--){
+                        if (inputFieldsJulia[i].isFocused){
+                            inputFieldsJulia[i].text = previousValuesJulia[i];
+                            inputFieldsJulia[(i-1) % 2].Select();
+                        }else{
+                            inputFieldsJulia[0].text = previousValuesJulia[0];
+                            inputFieldsJulia[1].Select();
+                        }
+                        break;
+                    }
+                }
+            }else{
+                if (allowEnter){
+                    for (int i = 0; i < 6; i++){
+                        if(inputFields[i].isFocused){
+                            inputFields[(i+1) % 6].Select();
+                            break;
+                        }
+                    }
+                }
+                if (allowEnterJulia){
+                    for (int i = 0; i < 2; i++){
+                        if (inputFieldsJulia[i].isFocused){
+                            inputFieldsJulia[(i+1) % 2].Select();
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
+ 
     }
 
     private IEnumerator OnSubmitJulia(){
@@ -562,6 +630,20 @@ public class InterfaceController : MonoBehaviour
                 error = true;
             }
             if (double.TryParse(inputFields[i].text, out result)){
+                switch (inputFields[i].name)
+                {
+                    case "Zoom Input Field":
+                        Clamp(ref result, 4e-13, 2.0, "Mandelbrot "+inputFields[i].name);
+                        break;
+                    case "Pan X Input Field":
+                        Clamp(ref result, -2.0, 2.0, "Mandelbrot "+inputFields[i].name);
+                        break;
+                    case "Pan Y Input Field":
+                        Clamp(ref result, -2.0, 2.0, "Mandelbrot "+inputFields[i].name);
+                        break;
+                    default:
+                        break;
+                }
                 inputFields[i].text = result.ToString(format);
                 continue;
             }else{
@@ -584,6 +666,20 @@ public class InterfaceController : MonoBehaviour
                 changed = true;
             }
             if (double.TryParse(inputFields[i].text, out result)){
+                switch (inputFields[i].name)
+                {
+                    case "Zoom Input Field":
+                        Clamp(ref result, 4e-13, 2.0, "Julia "+inputFields[i].name);
+                        break;
+                    case "Pan X Input Field":
+                         Clamp(ref result, -2.0, 2.0, "Julia "+inputFields[i].name);
+                         break;
+                    case "Pan Y Input Field":
+                        Clamp(ref result, -2.0, 2.0, "Julia "+inputFields[i].name);
+                        break;
+                    default:
+                        break;
+                }
                 inputFields[i].text = result.ToString(format);
                 continue;
             }else{
@@ -644,9 +740,23 @@ public class InterfaceController : MonoBehaviour
     private void Clamp(ref double value, double min, double max){
         if (value < min){
             value = min;
+            //LogsController.UpdateLogs(new string[] {"You have reached the minimum value for this parameter."}, "#FFA600");
         }
         if (value > max){
             value = max;
+            //LogsController.UpdateLogs(new string[] {"You have reached the maximum value for this parameter."}, "#FFA600");
+
+        }
+    }
+
+    private void Clamp(ref double value, double min, double max, string source){
+        if (value < min){
+            value = min;
+            LogsController.UpdateLogs(new string[] {"You have reached the minimum value for " + source + "."}, "#FFA600");
+        }
+        if (value > max){
+            value = max;
+            LogsController.UpdateLogs(new string[] {"You have reached the maximum value for " + source + "."}, "#FFA600");
         }
     }
 

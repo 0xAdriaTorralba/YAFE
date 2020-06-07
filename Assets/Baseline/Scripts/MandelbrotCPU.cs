@@ -26,8 +26,10 @@ public class MandelbrotCPU : FractalCPU
     private Image progressBar;
     private TextMeshProUGUI percentage;
 
-    CancellationTokenSource cancellationTokenSource;
-    CancellationToken cancellationToken;
+    private CancellationTokenSource cancellationTokenSource;
+    private CancellationToken cancellationToken;
+
+    private bool cancelled = false;
 
     void Awake(){
         cancellationTokenSource = new CancellationTokenSource();
@@ -51,22 +53,21 @@ public class MandelbrotCPU : FractalCPU
     public override void StartDraw(){
         try{
             StopCoroutine(rp.drawingThread);
-
             if (!rp.finished){
                 LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine stopped."}, "#FFA600");
-                cancellationTokenSource.Cancel();
             }
         }catch {
             Debug.Log("There is no Mandelbrot drawing coroutine running.");
         }finally {
             rp.finished = false;
+            cancellationTokenSource = new CancellationTokenSource();
             if (!rp.parallel){
                 switch(fp.algorithm){
                     case "Escape Algorithm":
                         rp.drawingThread = StartCoroutine(Draw());
                         break;
                     case "Henriksen Algorithm":
-                        rp.drawingThread = StartCoroutine(Draw());
+                        rp.drawingThread = StartCoroutine(DrawHenriksen());
                         break;
                     default:
                         rp.drawingThread = StartCoroutine(Draw());
@@ -79,7 +80,7 @@ public class MandelbrotCPU : FractalCPU
                         rp.drawingThread = StartCoroutine(DrawParallelized());
                         break;
                     case "Henriksen Algorithm":
-                        rp.drawingThread = StartCoroutine(DrawParallelized());
+                        rp.drawingThread = StartCoroutine(DrawHenriksenParallelized());
                         break;
                     default:
                         rp.drawingThread = StartCoroutine(Draw());
@@ -87,6 +88,12 @@ public class MandelbrotCPU : FractalCPU
 
                 }
             }
+            Task.Factory.StartNew(() =>
+            {
+                if (cancelled){
+                    cancellationTokenSource.Cancel();
+                }
+            });
         }
     }
 
@@ -99,9 +106,156 @@ public class MandelbrotCPU : FractalCPU
         percentage.text = (int)(GetProgress()*100) + "";
     }
 
-    protected IEnumerator DrawParallelized(){
+    protected IEnumerator DrawHenriksenParallelized(){
         cancellationTokenSource = new CancellationTokenSource();
         cancellationToken = cancellationTokenSource.Token;
+        LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine started."}, "#ffffffff");
+        System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+        watch.Start();
+        CorrectAspectRatio();
+        rp.xmin = - rp.xmax;
+        rp.ymin = - rp.ymax;
+        rp.tex2D = new Texture2D((int) rp.pwidth, (int) rp.pheight);
+        rp.viewPortWidth = rp.xmax - rp.xmin;
+        rp.viewPortHeight = rp.ymax - rp.ymin;
+        ArrayList results = null;
+        Task task = Task.Factory.StartNew(delegate {
+            rp.count = 0;
+            ArrayList res = new ArrayList();
+            results = ArrayList.Synchronized(res);
+            //cancellationToken.ThrowIfCancellationRequested();
+        Parallel.For(0, rp.pwidth, (int x) => {
+            //cancellationToken.ThrowIfCancellationRequested();
+
+            Parallel.For(0, rp.pheight, (int y) => {
+                Color value;
+                int i;
+                value = ComputeConvergenceHenriksenColor(x, y);
+                results.Add(new ColorData(value, x, y));
+                lock(lockObject){
+                    rp.count++;
+                }
+                
+                
+            });
+            
+        } ); 
+        //}, cancellationToken);
+        });
+
+        while (!task.IsCompleted){
+            UpdateProgress();
+            yield return new WaitForEndOfFrame();
+        }
+        UpdateProgress();
+        foreach(ColorData c in results){
+            rp.tex2D.SetPixel(c.x, c.y, c.color);
+        }
+        rp.tex2D.Apply();
+        rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
+        yield return new WaitForSeconds(0.5f);
+        rp.finished = true;
+        watch.Stop();
+        Color[] aux = rp.tex2D.GetPixels();
+        LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
+        
+    }
+
+     protected IEnumerator DrawHenriksen(){
+        LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine started."}, "#ffffffff");
+        System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+        watch.Start();
+        int i;
+        rp.count = 0;
+        CorrectAspectRatio();
+        rp.xmin = - rp.xmax;
+        rp.ymin = - rp.ymax;
+        rp.tex2D = new Texture2D((int) rp.pwidth, (int) rp.pheight);
+        rp.viewPortWidth = rp.xmax - rp.xmin;
+        rp.viewPortHeight = rp.ymax - rp.ymin;
+        ArrayList res = new ArrayList();
+        for(int x = 0; x < rp.pwidth; x++){
+            for (int y = 0; y < rp.pheight; y++){
+                Color value;
+                value = ComputeConvergenceHenriksenColor(x, y);
+                //value = PickColor(i);
+                rp.tex2D.SetPixel(x, y, value);
+                rp.count++;
+                
+            }
+            // For display purposes
+            if (x % 10 == 0){
+                UpdateProgress();
+                //yield return new WaitForSeconds(0.001f);
+                yield return new WaitForEndOfFrame();
+            }
+            
+        }
+        UpdateProgress();
+        rp.tex2D.Apply();
+        rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
+        yield return new WaitForSeconds(0.5f);
+        rp.finished = true;
+        watch.Stop();
+        LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully in " + (watch.ElapsedMilliseconds/1000.0).ToString("F2") +  "s!"}, "#75FF00");
+        
+    }
+
+    private Color ComputeConvergenceHenriksenColor(int x, int y){
+        Complex z, dz, epsilon, c;
+        bool orbitFound;
+        int i;
+        double tol;
+        lock(lockObject){
+            rp.viewPortX = rp.xmin + ((double) x / rp.pwidth) * rp.viewPortWidth + rp.panX;
+            rp.viewPortY = rp.ymin + ((double) y / rp.pheight) * rp.viewPortHeight + rp.panY;
+            z = new Complex(0.0, 0.0);
+            //w = new Complex(rp.viewPortX, rp.viewPortY);
+            dz = new Complex(1.0, 0.0);
+            epsilon = new Complex(50.0, 50.0);
+            orbitFound = false;
+            c = new Complex(rp.viewPortX, rp.viewPortY);
+            i = 0;
+            tol = rp.viewPortWidth / (double)fp.detail;
+        }
+        while (
+                i < fp.maxIters && 
+                !orbitFound
+            ){
+            dz = fp.degree * Complex.Pow(z, fp.degree - 1) * dz + 1;
+            z = Complex.Pow(z, fp.degree) + c;
+
+            if (Complex.Abs(z) > 500){
+                return PickColor(i);
+            }
+
+            epsilon = z / dz;
+            if (Complex.Abs(epsilon) < tol){
+                orbitFound = true;
+                break;
+            }
+ 
+            i++;
+
+        }
+
+        // condition i > 5 (for instance) in order to avoid find fixed points inside the filled Julia set.
+        if (orbitFound){
+            return Color.black;
+        }else{
+            return new Color(184/255.0f, 28/255.0f, 74/255.0f);
+        }
+    }
+
+    protected IEnumerator DrawParallelized(){
+        cancelled = false;
+        cancellationTokenSource = new CancellationTokenSource();
+        // Use ParallelOptions instance to store the CancellationToken
+        ParallelOptions po = new ParallelOptions();
+        po.CancellationToken = cancellationTokenSource.Token;
+        //po.MaxDegreeOfParallelism = System.Environment.ProcessorCount;
+
+        //cancellationToken = cancellationTokenSource.Token;
         LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine started."}, "#ffffffff");
         System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
         watch.Start();
@@ -115,35 +269,45 @@ public class MandelbrotCPU : FractalCPU
         rp.viewPortHeight = rp.ymax - rp.ymin;
         ArrayList results = null;
         Task task = Task.Factory.StartNew(delegate {
-            rp.count = 0;
-            ArrayList res = new ArrayList();
-            results = ArrayList.Synchronized( res );
-            Parallel.For(0, rp.pwidth, (int x) => {
-                cancellationToken.ThrowIfCancellationRequested();
-                //for (int y = 0; y < rp.pheight; y++){
-                Parallel.For(0, rp.pheight, (int y) => {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    int i = 0;
-                    Color value;
-                        i = ComputeConvergence(x, y);  
-                    value = PickColor(i);
-                    results.Add(new ColorData(value, x, y));
-                    lock(lockObject){
-                        rp.count++;
-                    }
-                
+        try{
+                rp.count = 0;
+                ArrayList res = new ArrayList();
+                results = ArrayList.Synchronized( res );
+                Parallel.For(0, rp.pwidth, po, (int x) => {
+                    po.CancellationToken.ThrowIfCancellationRequested();
+                    //for (int y = 0; y < rp.pheight; y++){
+                    Parallel.For(0, rp.pheight, po, (int y) => {
+                        int i = 0;
+                        Color value;
+                            i = ComputeConvergence(x, y);  
+                        value = PickColor(i);
+                        results.Add(new ColorData(value, x, y));
+                        lock(lockObject){
+                            rp.count++;
+                        }
+                       if (po.CancellationToken.IsCancellationRequested)
+                        {
+                        // Clean up here, then...
+                        po.CancellationToken.ThrowIfCancellationRequested();
+                        }
+                    
+                    });
+                    //}
+                    
                 });
-                //}
-                
-            });
-        }, cancellationToken);
+        }catch (OperationCanceledException e){
+            Console.WriteLine(e.Message);
+        }finally{
+            cancellationTokenSource.Dispose();
+        }
+        } );
         while (!task.IsCompleted){
             if (!cancellationToken.IsCancellationRequested){
                 UpdateProgress();
             }else{
                 break;
             }
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForEndOfFrame();
         }
         UpdateProgress();
         foreach(ColorData c in results){
@@ -154,7 +318,7 @@ public class MandelbrotCPU : FractalCPU
         rp.finished = true;
         
         watch.Stop();
-        LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
+        LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully in " + (watch.ElapsedMilliseconds/1000.0).ToString("F2") +  "s!"}, "#75FF00");
         yield return new WaitForSeconds(0.5f);
 
     }
@@ -185,7 +349,8 @@ public class MandelbrotCPU : FractalCPU
             }
             if (x % 20 == 0){
                 UpdateProgress();
-                yield return new WaitForSeconds(0.001f);
+                //yield return new WaitForSeconds(0.001f);
+                yield return new WaitForEndOfFrame();
 
 
             }
@@ -196,7 +361,7 @@ public class MandelbrotCPU : FractalCPU
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
         watch.Stop();
-        LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
+        LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine finished successfully in " + (watch.ElapsedMilliseconds/1000.0).ToString("F2") +  "s!"}, "#75FF00");
     }
 
     private int ComputeConvergence(int x, int y){

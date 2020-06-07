@@ -32,6 +32,8 @@ TagManager:
   - MandelbrotQuad
   - JuliaQuad
   - Mandelbulb
+  - SliderDetail
+  - InputFieldDetail
   layers:
   - Default
   - TransparentFX

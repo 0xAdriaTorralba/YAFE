@@ -181,7 +181,7 @@ public class JuliaCPU : FractalCPU
         } );} );
         while (!task.IsCompleted){
             UpdateProgress();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForEndOfFrame();
         }
         UpdateProgress();
         foreach(ColorData c in results){
@@ -195,7 +195,7 @@ public class JuliaCPU : FractalCPU
         Color[] aux = rp.tex2D.GetPixels();
         originalImage = new Texture2D(rp.pwidth, rp.pheight);
         originalImage.SetPixels(aux);
-        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + (watch.ElapsedMilliseconds/1000.0).ToString("F2") +  "s!"}, "#75FF00");
         
     }
 
@@ -224,7 +224,8 @@ public class JuliaCPU : FractalCPU
             // For display purposes
             if (x % 10 == 0){
                 UpdateProgress();
-                yield return new WaitForSeconds(0.001f);
+                //yield return new WaitForSeconds(0.001f);
+                yield return new WaitForEndOfFrame();
             }
             
         }
@@ -237,7 +238,7 @@ public class JuliaCPU : FractalCPU
         Color[] aux = rp.tex2D.GetPixels();
         originalImage = new Texture2D(rp.pwidth, rp.pheight);
         originalImage.SetPixels(aux);
-        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + (watch.ElapsedMilliseconds/1000.0).ToString("F2") +  "s!"}, "#75FF00");
         
     }
 
@@ -295,7 +296,7 @@ public class JuliaCPU : FractalCPU
         } );
         while (!task.IsCompleted){
             UpdateProgress();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForEndOfFrame();
         }
         UpdateProgress();
         foreach(ColorData c in results){
@@ -309,7 +310,7 @@ public class JuliaCPU : FractalCPU
         Color[] aux = rp.tex2D.GetPixels();
         originalImage = new Texture2D(rp.pwidth, rp.pheight);
         originalImage.SetPixels(aux);
-        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + (watch.ElapsedMilliseconds/1000.0).ToString("F2")+  "s!"}, "#75FF00");
         
     }
 
@@ -338,7 +339,8 @@ public class JuliaCPU : FractalCPU
                 // For display purposes
                 if (x % 10 == 0){
                     UpdateProgress();
-                    yield return new WaitForSeconds(0.001f);
+                    //yield return new WaitForSeconds(0.001f);
+                    yield return new WaitForEndOfFrame();
                 }
         }
         UpdateProgress();
@@ -350,7 +352,7 @@ public class JuliaCPU : FractalCPU
         Color[] aux = rp.tex2D.GetPixels();
         originalImage = new Texture2D(rp.pwidth, rp.pheight);
         originalImage.SetPixels(aux);
-        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + watch.ElapsedMilliseconds/1000.0+  "s!"}, "#75FF00");
+        LogsController.UpdateLogs(new string[] {"Julia drawing corroutine finished successfully in " + (watch.ElapsedMilliseconds/1000.0).ToString("F2")+  "s!"}, "#75FF00");
         
     }
 
@@ -383,14 +385,11 @@ public class JuliaCPU : FractalCPU
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
     }
 
-    public int iters = 1000;
-    public int threshold = 1000;
-    public double tol = 1;
-
     private Color ComputeConvergenceHenriksenColor(int x, int y, double reZ, double imZ){
         Complex z, w, dz, epsilon, c;
         bool orbitFound;
         int i;
+        double tol;
         lock(lockObject){
             rp.viewPortX = rp.xmin + ((double) x / rp.pwidth) * rp.viewPortWidth + rp.panX;
             rp.viewPortY = rp.ymin + ((double) y / rp.pheight) * rp.viewPortHeight + rp.panY;
@@ -401,16 +400,16 @@ public class JuliaCPU : FractalCPU
             orbitFound = false;
             c = new Complex(reZ, imZ);
             i = 0;
-            tol = rp.viewPortWidth / (double)1e4;
+            tol = rp.viewPortWidth / (double)fp.detail;
         }
         while (
-                i < iters && 
+                i < fp.maxIters && 
                 !orbitFound
             ){
             dz = fp.degree * Complex.Pow(z, fp.degree - 1) * dz;
             z = Complex.Pow(z, fp.degree) + c;
 
-            if (Complex.Abs(z) > threshold){
+            if (Complex.Abs(z) > 500){
                 return PickColor(i);
             }
 

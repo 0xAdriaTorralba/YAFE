@@ -17,7 +17,12 @@ public class RenderingParameters{
     public int count;
     public bool finished;
     public Coroutine drawingThread;
-    public bool parallel = true;
+    #if UNITY_WEBGL && !UNITY_EDITOR
+        public bool parallel = true;
+    #else
+        //WebGL does not support CPU Threads at moment, so we need to deactivate this feature :(
+        public bool parallel = false;
+    #endif
 }
 [System.Serializable]
 public class FractalParameters{
@@ -25,6 +30,7 @@ public class FractalParameters{
 
     public int threshold = 2;
 
+    public int detail = 5000;
     public int degree = 2;
     public string algorithm;
     public string colorMap;

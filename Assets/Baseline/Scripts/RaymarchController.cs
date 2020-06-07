@@ -14,7 +14,6 @@ public class RaymarchController : SceneViewFilter
     [Range (500, 10000)]
     public float _RaymarchDrawDistance = 40;
     [SerializeField]
-    private bool _DebugPerformance = false;
 
     private RenderTexture source, destination;
 
