@@ -87,68 +87,84 @@ Shader "Fractals/3DScene"
 				return o;
 			}
 
-			// int last = 0;
-			// float escapeLength(in float3 pos)
-			// {
-			// 	float3 z = pos;
-			// 	for(int i=1; i < 10; i++)
-			// 	{
-			// 			last = i;
-			// 			//return length(z);
-			// 	}	
-			// 	return length(z);
-			// }
+	
 
-			// float mandelbrotDE(float3 p) {
-			// 	last = 0;
-			// 	float r = escapeLength(p);
-			// 	if (r*r<5) return 0.0;
-			// 	float3 gradient = (float3(escapeLength(p+xDir*EPS), escapeLength(p+yDir*EPS), escapeLength(p+zDir*EPS))-r)/EPS;
-			// 	return 0.5*r*log(r)/length(gradient);
-			// }
 
-			float sdBox( float3 p, float3 b )
-			{
-			float3 d = abs(p) - b;
-			return min(max(d.x,max(d.y,d.z)),0.0) +
-					length(max(d,0.0));
-			}
+		float sdBox( float3 p, float3 b ) {
+			float3  di = abs(p) - b;
+			float mc = max(di.x,max(di.y,di.z));
+			return min(mc,length(max(di,0.0)));
+		}
 
-			float2 MengerSponge( in float3 p )
-			{
-				p.xy = fmod(p.xy, 2.44) - 1.22;
-				
+		float MengerSponge( in float3 p ) {
 			float d = sdBox(p,float3(1.0, 1.0, 1.0));
-			float2 res = float2( d, 1.0 );
-
-			float s = 1.0;
-			for( int m=0; m < _IFSIters; m++ )
-			{
-				/*p = vRotateX(p, rand(float(m)) * M_PI * 2.0);
-				p = vRotateY(p, rand(float(m + Iterations)) * M_PI * 2.0);
-				p = vRotateY(p, rand(float(m + Iterations * 2)) * M_PI * 2.0);*/
-				
-				float3 a = fmod( p*s, 2.0 )-1.0;
-				s *= 3.0;
-				float3 r = abs(1.0 - 3.0*abs(a));
-
+			float s = .5;
+			for( int m=0; m<_IFSIters; m++ ) {
+				float3 a = frac( p*s )-.5;
+				s *= 3.;
+				float3 r = abs(1.-6.*abs(a));
 				float da = max(r.x,r.y);
 				float db = max(r.y,r.z);
 				float dc = max(r.z,r.x);
-				float c = (min(da,min(db,dc))-1.0)/s;
+				float c = (min(da,min(db,dc))-1.0)/(2.*s);
 
-				if( c>d )
-				{
+				if( c>d ) {
 					d = c;
-					res = float2( d, 0.2*da*db*dc);//, (1.0+float(m))/4.0 );
 				}
 			}
+			return d;
+		}
 
-			return res;
+		float calcSoftshadow( in float3 ro, in float3 rd, in float mint, in float tmax ) {
+			float res = 1.0;
+			float t = mint;
+			float ph = 1e10; 
+			for( int i=0; i<32; i++ ) {
+				float h = MengerSponge( ro + rd*t );
+				float y = h*h/(2.0*ph);
+				float d = sqrt(max(0.,h*h-y*y));
+				res = min( res, 8.0*d/max(0.0001,t-y) );
+				ph = h;
+				t += h;//min(h, .1);// clamp( h, 0.02, 0.10 );
+				if( res<0.001 || t>tmax ) break;
 			}
+			return clamp( res, 0.0, 1.0 );
+		}
+
+		float calcAO( in float3 pos, in float3 nor ) {
+			float occ = 0.0;
+			float sca = 1.0;
+			for( int i=0; i<5; i++ ) {
+				float hr = 0.01 + 0.5*float(i)/4.0;
+				float3 aopos =  nor * hr + pos;
+				float dd = MengerSponge( aopos );
+				occ += -(dd-hr)*sca;
+				sca *= 0.9;
+			}
+			return clamp( 1. - 3.0*occ, 0.0, 1.0 );    
+		}
+
+		float3 calcNormal(in float3 pos) {
+			float3  eps = float3(.001,0.0,0.0);
+			float3 nor;
+			nor.x = MengerSponge(pos+eps.xyy) - MengerSponge(pos-eps.xyy);
+			nor.y = MengerSponge(pos+eps.yxy) - MengerSponge(pos-eps.yxy);
+			nor.z = MengerSponge(pos+eps.yyx) - MengerSponge(pos-eps.yyx);
+			return normalize(nor);
+		}
+
+		float4 tex3D( sampler2D sam, in float3 p, in float3 n ) {
+			float4 x = tex2D( sam, p.yz );
+			float4 y = tex2D( sam, p.zx );
+			float4 z = tex2D( sam, p.xy );
+
+			return x*abs(n.x) + y*abs(n.y) + z*abs(n.z);
+		}
 
 
-			float2 Sierpinski(float3 z)
+
+
+			float Sierpinski(float3 z)
 
 			{				
 				float Scale = 2.0f;
@@ -173,7 +189,7 @@ Shader "Fractals/3DScene"
 					n++;
 				}
 
-				return float2(length(z) * pow(Scale, float(-n)), n);
+				return length(z) * pow(Scale, float(-n));
 			}
 
 
@@ -183,7 +199,7 @@ Shader "Fractals/3DScene"
 			}
 
 
-			float2 mandelbulbDE(float3 pos){
+			float mandelbulbDE(float3 pos){
 				float3 z = pos;
 				float dr = 1.0f;
 				float r = 0.0f;
@@ -210,12 +226,12 @@ Shader "Fractals/3DScene"
 									 cos(theta));
 					z += pos;
 				}
-				return float2(0.5f * log(r) * r/dr, i);
+				return 0.5f * log(r) * r/dr;
 			}
 
 
 			uniform int maxstep;
-			float4 trace(float3 from, float3 direction) {
+			float4 trace(float3 from, float3 direction, v2f f) {
 				float totalDistance = 0.0f;
 				float h = 0.25;
 				float3 aux1, aux2;
@@ -241,27 +257,19 @@ Shader "Fractals/3DScene"
 					}
 					totalDistance += res.x;
 					
-					//if (res.y == 64) break; // 64 \equiv maxiters de mandelbulbDE de NO convergir
-					if (res.x < MinimumDistance || res.y > maxstep) {
+					if (res.x < MinimumDistance) {
 						break;
 					}
 
-					// if (res.y == 64){
-					// 	color = float4(0, 0, 0, 1);
-					// }else{
-					// 	color = float4(sin(res.y/4), sin(res.y/5), sin(res.y/7), 1) / 4 + 0.75;
-         			// }	
 
 				}
-				//return color;
-				// TODO posar color com a 2D (usant el iterat)
 				
 				aux1 = float3(t.x+h, t.y, t.z);
 				aux2 = float3(t.x-h, t.y, t.z);
 				if (_type == 1){
 					normal_x = ( mandelbulbDE(aux1) - mandelbulbDE(aux2) ) / ( 2*h );
 				}
-				if (_type == 2){
+				if (_type == 2 || _type == 3){
 					normal_x = ( sphereDE(aux1) - sphereDE(aux2) ) / ( 2*h );
 				}
 
@@ -270,7 +278,7 @@ Shader "Fractals/3DScene"
 				if (_type == 1){
 					normal_y = ( mandelbulbDE(aux1) - mandelbulbDE(aux2) ) / ( 2*h );
 				}
-				if (_type == 2){
+				if (_type == 2 || _type == 3){
 					normal_y = ( sphereDE(aux1) - sphereDE(aux2) ) / ( 2*h );
 				}
 
@@ -279,30 +287,55 @@ Shader "Fractals/3DScene"
 				if (_type == 1){
 					normal_z = ( mandelbulbDE(aux1) - mandelbulbDE(aux2) ) / ( 2*h );
 				}
-				if (_type == 2){
+				if (_type == 2 || _type == 3){
 					normal_z = ( sphereDE(aux1) - sphereDE(aux2) ) / ( 2*h );
 				}
 
 				normal = float3(normal_x, normal_y, normal_z);
-
 				normal = normalize(normal);
 
-				//return 1.0 - float(i) /float(maxstep);
-				//return float4(1.0-float(i)/float(maxstep), 1.0-float(i)/float(maxstep), 1.0-float(i)/float(maxstep), 1.0);
-				if (i/float(maxstep) > 0.8){ return float4(0.0, 0.0, 0.0, 1.0);}
-				color = float4(
+				if (_type == 3){
+					float3 col;
+					if (i == maxstep){ return float4(0.0, 0.0, 0.0, 1.0);}
+
+					if (totalDistance < 100) {
+						float3 p = from + totalDistance * direction;
+						float3 n = calcNormal(p);
+						float3 ref = reflect(direction, n);
+
+						float ao = .4 + .6 * calcAO(p, n);
+						float sh = .4 + .6 * calcSoftshadow(p, _LightDir, 0.005, 1.);
+					
+						float diff = max(0.,dot(_LightDir,n)) * ao * sh;
+						float amb  = (.4+.2*n.y) * ao * sh;
+						float spe = pow(clamp(dot(ref,_LightDir), 0., 1.),8.) * sh * .5;
+						
+						float3 mat = tex3D(_MainTex, p, n).rgb;
+						col = (amb + diff) * lerp(float3(.4,.6,.8),float3(.1,.2,.3),mat.r) + spe * dot(mat,mat);
+						//col *= float3(172/255.0, 167/255.0, 176/255.0);
+						//col *= normal;
+				}
+				
+					// gamma
+					col = lerp(col, sqrt( clamp(col,float3(0,0, 0),float3(1, 1, 1 ))), .99);
+					//col = normalize(col);
+					return float4(clamp(col,float3(0, 0, 0),float3(2, 2, 2)), 1.0);
+				}
+
+				if (i == maxstep){ 
+					return float4(0.0, 0.0, 0.0, 1.0);
+				}else{
+					color = normalize(color);
+					color = float4(
 							1 - (float(i)/float(maxstep))+normal_x, 
 							1 - (float(i)/float(maxstep))+normal_y, 
 							1 - (float(i)/float(maxstep))+normal_z, 
 							1.0
-						);
-				//color = float4(1.0, 1.0, 1.0, 0.0) + color;
-				//color = color * (1.0 / 2.0);
-				color.w = 1.0;
-				color = float4(pow(color.x, 6.2), pow(color.y, 6.2), pow(color.z, 6.2), 1.0);
-				//color = normalize(color);
-				return color;
-				//return fixed4(tex2D(_ColorRamp_Material, float2(t.y,0)).xyz * light, 1);
+					);
+					color = float4(pow(color.x, 6.2), pow(color.y, 6.2), pow(color.z, 6.2), 1.0);
+					return color;
+				}
+				
 			}
 
 
@@ -330,7 +363,8 @@ Shader "Fractals/3DScene"
 
 				fixed3 col = tex2D(_MainTex,i.uv);
 
-				fixed4 add = trace(ro, rd);
+				fixed4 add = trace(ro, rd, i);
+
 
 
 				// Returns final color using alpha blending

@@ -282,6 +282,8 @@ public class JuliaCPU : FractalCPU
                     Color value;
                     int i = 0;
                     i = ComputeConvergence(x, y, reZ, imZ);
+
+
                     value = PickColor(i);
                     
                     results.Add(new ColorData(value, x, y));
@@ -488,6 +490,8 @@ public class JuliaCPU : FractalCPU
                 }
         }
     }
+
+   
 
     public void SetNumImages(int numImages){
         this.numImages = numImages;

@@ -86,6 +86,7 @@ public class MandelbulbController : Fractal
                     break;
                 case "Menger Sponge":
                     raymarching.type = 3;
+                    TogleControls(true, false);
                     break;
                 default:
                     raymarching.type = 1;

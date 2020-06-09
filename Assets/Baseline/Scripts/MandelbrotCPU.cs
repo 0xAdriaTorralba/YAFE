@@ -253,14 +253,11 @@ public class MandelbrotCPU : FractalCPU
         // Use ParallelOptions instance to store the CancellationToken
         ParallelOptions po = new ParallelOptions();
         po.CancellationToken = cancellationTokenSource.Token;
-        //po.MaxDegreeOfParallelism = System.Environment.ProcessorCount;
 
-        //cancellationToken = cancellationTokenSource.Token;
         LogsController.UpdateLogs(new string[] {"Mandelbrot drawing corroutine started."}, "#ffffffff");
         System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
         watch.Start();
 
-        //BlockingCollection<ColorData> results = new BlockingCollection<ColorData>();
         CorrectAspectRatio();
         rp.xmin = - rp.xmax;
         rp.ymin = - rp.ymax;
@@ -269,7 +266,7 @@ public class MandelbrotCPU : FractalCPU
         rp.viewPortHeight = rp.ymax - rp.ymin;
         ArrayList results = null;
         Task task = Task.Factory.StartNew(delegate {
-        try{
+
                 rp.count = 0;
                 ArrayList res = new ArrayList();
                 results = ArrayList.Synchronized( res );
@@ -279,27 +276,18 @@ public class MandelbrotCPU : FractalCPU
                     Parallel.For(0, rp.pheight, po, (int y) => {
                         int i = 0;
                         Color value;
-                            i = ComputeConvergence(x, y);  
+                        i = ComputeConvergence(x, y);  
                         value = PickColor(i);
                         results.Add(new ColorData(value, x, y));
                         lock(lockObject){
                             rp.count++;
                         }
-                       if (po.CancellationToken.IsCancellationRequested)
-                        {
-                        // Clean up here, then...
-                        po.CancellationToken.ThrowIfCancellationRequested();
-                        }
+
                     
                     });
                     //}
                     
                 });
-        }catch (OperationCanceledException e){
-            Console.WriteLine(e.Message);
-        }finally{
-            cancellationTokenSource.Dispose();
-        }
         } );
         while (!task.IsCompleted){
             if (!cancellationToken.IsCancellationRequested){
@@ -448,4 +436,6 @@ public class MandelbrotCPU : FractalCPU
                 }
         }
     }
+
+   
 }

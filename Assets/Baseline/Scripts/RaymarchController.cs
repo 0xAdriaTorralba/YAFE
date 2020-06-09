@@ -26,7 +26,8 @@ public class RaymarchController : SceneViewFilter
     [Range(20, 300)]
     public int maxsteps = 20;
 
-    public int IFSIters = 2;
+    [Range(1, 50)]
+    public int IFSIters = 1;
     
 
 
