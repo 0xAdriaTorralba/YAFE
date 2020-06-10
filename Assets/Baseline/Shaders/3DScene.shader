@@ -86,19 +86,52 @@ Shader "Fractals/3DScene"
 
 				return o;
 			}
-
+		float basic_box(float3 pos, float3 b){
+    float3 d = abs(pos) - b;
+    return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+}
 	
 
 
 		float sdBox( float3 p, float3 b ) {
-			float3  di = abs(p) - b;
+			float3 di = abs(p) - b;
 			float mc = max(di.x,max(di.y,di.z));
 			return min(mc,length(max(di,0.0)));
 		}
 
+		float MengerSponge2(float3 p){
+
+			float main_width_b = 4.0;
+			float inf = 50.0;
+
+			float hole_x, hole_y, hole_z;
+			float hole_width_b = main_width_b / 3.0;
+			
+			float menger = basic_box(p, float3(main_width_b, main_width_b, main_width_b));
+			
+			for (int iter=0; iter<_IFSIters; iter++){
+
+				float hole_distance = hole_width_b * 6.0;
+		
+				float3 c = float3(hole_distance, hole_distance, hole_distance);
+				float3 q = fmod(p + float3(hole_width_b, hole_width_b, hole_width_b), c) - float3(hole_width_b, hole_width_b, hole_width_b);
+
+				hole_x = basic_box(q, float3(inf, hole_width_b, hole_width_b));
+				hole_y = basic_box(q, float3(hole_width_b, inf, hole_width_b));
+				hole_z = basic_box(q, float3(hole_width_b, hole_width_b, inf));
+
+				hole_width_b = hole_width_b / 3.0;        // reduce hole size for next iter
+				menger = max(max(max(menger, -hole_x), -hole_y), -hole_z); // subtract
+
+			}
+
+			return menger;
+
+		}
+
 		float MengerSponge( in float3 p ) {
-			float d = sdBox(p,float3(1.0, 1.0, 1.0));
-			float s = .5;
+			float d = basic_box(p,float3(10.0, 10.0, 10.0));
+			float s = .05;
 			for( int m=0; m<_IFSIters; m++ ) {
 				float3 a = frac( p*s )-.5;
 				s *= 3.;
@@ -107,7 +140,6 @@ Shader "Fractals/3DScene"
 				float db = max(r.y,r.z);
 				float dc = max(r.z,r.x);
 				float c = (min(da,min(db,dc))-1.0)/(2.*s);
-
 				if( c>d ) {
 					d = c;
 				}
