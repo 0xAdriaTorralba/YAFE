@@ -99,36 +99,6 @@ Shader "Fractals/3DScene"
 			return min(mc,length(max(di,0.0)));
 		}
 
-		float MengerSponge2(float3 p){
-
-			float main_width_b = 4.0;
-			float inf = 50.0;
-
-			float hole_x, hole_y, hole_z;
-			float hole_width_b = main_width_b / 3.0;
-			
-			float menger = basic_box(p, float3(main_width_b, main_width_b, main_width_b));
-			
-			for (int iter=0; iter<_IFSIters; iter++){
-
-				float hole_distance = hole_width_b * 6.0;
-		
-				float3 c = float3(hole_distance, hole_distance, hole_distance);
-				float3 q = fmod(p + float3(hole_width_b, hole_width_b, hole_width_b), c) - float3(hole_width_b, hole_width_b, hole_width_b);
-
-				hole_x = basic_box(q, float3(inf, hole_width_b, hole_width_b));
-				hole_y = basic_box(q, float3(hole_width_b, inf, hole_width_b));
-				hole_z = basic_box(q, float3(hole_width_b, hole_width_b, inf));
-
-				hole_width_b = hole_width_b / 3.0;        // reduce hole size for next iter
-				menger = max(max(max(menger, -hole_x), -hole_y), -hole_z); // subtract
-
-			}
-
-			return menger;
-
-		}
-
 		float MengerSponge( in float3 p ) {
 			float d = basic_box(p,float3(10.0, 10.0, 10.0));
 			float s = .05;
@@ -229,15 +199,15 @@ Shader "Fractals/3DScene"
 			float sphereDE(float3 p){
 				return length(p) - 1.0f;
 			}
+			uniform int maxstep;
 
 
 			float mandelbulbDE(float3 pos){
 				float3 z = pos;
 				float dr = 1.0f;
 				float r = 0.0f;
-				int maxIters = 64;
 				int i;
-				for (i = 0; i < maxIters; i++){
+				for (i = 0; i < maxstep; i++){
 					r = length(z);
 					if (r > 5){
 						break;
@@ -262,7 +232,6 @@ Shader "Fractals/3DScene"
 			}
 
 
-			uniform int maxstep;
 			float4 trace(float3 from, float3 direction, v2f f) {
 				float totalDistance = 0.0f;
 				float h = 0.25;
@@ -270,12 +239,13 @@ Shader "Fractals/3DScene"
 				float normal_x, normal_y, normal_z;
 				float3 normal;
 				float4 color;
-				float MinimumDistance = length(from - direction)/_DrawDistance;
+				float MinimumDistance = length(from-direction)/(float)_DrawDistance;
+				float m = 0;
 				float3 t = 0;
 				float light;
 				float n;
 				int i;
-				float2 res;
+				float res;
 				for (i = 0; i < maxstep; i++) {
 					t = from + totalDistance * direction;
 					if (_type == 1){
@@ -287,11 +257,13 @@ Shader "Fractals/3DScene"
 					if (_type == 3){
 						res = MengerSponge(t);
 					}
-					totalDistance += res.x;
+					totalDistance += res;
+					//totalDistance += sphereDE(t);
 					
-					if (res.x < MinimumDistance) {
+					if (abs(res.x) < MinimumDistance) {
 						break;
 					}
+
 
 
 				}
