@@ -76,7 +76,7 @@ public class SimpleCameraController : MonoBehaviour
     {
         m_TargetCameraState.SetFromTransform(transform);
         m_InterpolatingCameraState.SetFromTransform(transform);
-        automaticRotation = true;
+        //automaticRotation = true;
 
     }
 
