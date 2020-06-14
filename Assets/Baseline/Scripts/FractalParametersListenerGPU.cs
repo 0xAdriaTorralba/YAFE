@@ -79,6 +79,21 @@ public class FractalParametersListenerGPU : MonoBehaviour
 
     private void SliderValueChanged(Slider slider){
         if (string.Equals(slider.tag, "SliderMaxIters")){
+            // if ((int) slider.value < 200){
+            //     fractalMandelbrot.UpdateIterations(200);
+            //     fractalJulia.UpdateIterations(200);
+            //     inputFieldMaxIters.text = 200 + "";
+            // } 
+            // if ((int) slider.value > 200 && (int) slider.value < 500){
+            //     fractalMandelbrot.UpdateIterations(500);
+            //     fractalJulia.UpdateIterations(500);
+            //     inputFieldMaxIters.text = 500 + "";
+            // }
+            // if ((int) slider.value > 500){
+            //     fractalMandelbrot.UpdateIterations(800);
+            //     fractalJulia.UpdateIterations(800);
+            //     inputFieldMaxIters.text = 800 + "";
+            // } 
             fractalMandelbrot.UpdateIterations((int) slider.value);
             fractalJulia.UpdateIterations((int) slider.value);
             inputFieldMaxIters.text = slider.value + "";

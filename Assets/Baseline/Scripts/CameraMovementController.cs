@@ -65,26 +65,26 @@ public class CameraMovementController : MonoBehaviour
     }
     
     void Update(){
-        if (coordinatesListener.getIsPointerIn()){
-            HandleInputs();
+        // if (coordinatesListener.getIsPointerIn()){
+        //     HandleInputs();
  
-        }
-        if (smoothMovement){
-            // Apply Lerp function for smooth view
-            smoothScale = Mathf.Lerp(smoothScale, scale, .05f);
-            smoothPosition = Vector2.Lerp(smoothPosition, newPosition, .05f);
-        }else{
-            smoothScale = scale;
-            smoothPosition = newPosition;
-        }
+        // }
+        // if (smoothMovement){
+        //     // Apply Lerp function for smooth view
+        //     smoothScale = Mathf.Lerp(smoothScale, scale, .05f);
+        //     smoothPosition = Vector2.Lerp(smoothPosition, newPosition, .05f);
+        // }else{
+        //     smoothScale = scale;
+        //     smoothPosition = newPosition;
+        // }
 
-        // Clamping
-        newPosition.x = Mathf.Clamp(newPosition.x, -2, 2);
-        newPosition.y = Mathf.Clamp(newPosition.y, -2, 2);
-        scale = Mathf.Clamp(scale, 5e-6f, 2);
+        // // Clamping
+        // newPosition.x = Mathf.Clamp(newPosition.x, -2, 2);
+        // newPosition.y = Mathf.Clamp(newPosition.y, -2, 2);
+        // scale = Mathf.Clamp(scale, 5e-6f, 2);
 
-        fractal.UpdateZoom(smoothScale);
-        fractal.UpdatePosition(smoothPosition.x, smoothPosition.y);
+        // fractal.UpdateZoom(smoothScale);
+        // fractal.UpdatePosition(smoothPosition.x, smoothPosition.y);
         
     }
 

@@ -189,9 +189,9 @@ public class JuliaCPU : FractalCPU
         }
         rp.tex2D.Apply();
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
+        watch.Stop();
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
-        watch.Stop();
         Color[] aux = rp.tex2D.GetPixels();
         originalImage = new Texture2D(rp.pwidth, rp.pheight);
         originalImage.SetPixels(aux);
@@ -229,12 +229,12 @@ public class JuliaCPU : FractalCPU
             }
             
         }
+        watch.Stop();
         UpdateProgress();
         rp.tex2D.Apply();
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
-        watch.Stop();
         Color[] aux = rp.tex2D.GetPixels();
         originalImage = new Texture2D(rp.pwidth, rp.pheight);
         originalImage.SetPixels(aux);
@@ -300,6 +300,7 @@ public class JuliaCPU : FractalCPU
             UpdateProgress();
             yield return new WaitForEndOfFrame();
         }
+        watch.Stop();
         UpdateProgress();
         foreach(ColorData c in results){
             rp.tex2D.SetPixel(c.x, c.y, c.color);
@@ -308,7 +309,6 @@ public class JuliaCPU : FractalCPU
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
-        watch.Stop();
         Color[] aux = rp.tex2D.GetPixels();
         originalImage = new Texture2D(rp.pwidth, rp.pheight);
         originalImage.SetPixels(aux);
@@ -345,12 +345,12 @@ public class JuliaCPU : FractalCPU
                     yield return new WaitForEndOfFrame();
                 }
         }
+        watch.Stop();
         UpdateProgress();
         rp.tex2D.Apply();
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
         yield return new WaitForSeconds(0.5f);
         rp.finished = true;
-        watch.Stop();
         Color[] aux = rp.tex2D.GetPixels();
         originalImage = new Texture2D(rp.pwidth, rp.pheight);
         originalImage.SetPixels(aux);

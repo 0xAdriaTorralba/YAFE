@@ -11,12 +11,12 @@ public class JuliaGPU : FractalGPU
 
 
     void Start(){
-        UpdateZoom(2.0f);
-        UpdatePosition(0.0f, 0.0f);
+        UpdateZoom(0.25f);
+        UpdatePosition(0.4986667f, -0.05466667f);
         UpdateColormap("Colormap 1 (Sin)");
         UpdateIterations(100);
         UpdateThreshold(2);
-        UpdateSeed(0.0f, 0.0f);
+        UpdateSeed(-0.765f, 0.12f);
         UpdateDegree(2);
         this.RedrawAll();
     }
@@ -32,8 +32,8 @@ public class JuliaGPU : FractalGPU
     }
 
     public void UpdateSeed(float reZ, float imZ){
-        UpdateZoom(2.0f);
-        UpdatePosition(0.0f, 0.0f);
+        //UpdateZoom(2.0f);
+        //UpdatePosition(0.0f, 0.0f);
         this.reZ = reZ;
         this.imZ = imZ;
         RedrawSeed();

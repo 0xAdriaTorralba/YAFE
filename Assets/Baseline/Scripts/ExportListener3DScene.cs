@@ -28,6 +28,7 @@ public class ExportListener3DScene : MonoBehaviour, IPointerDownHandler {
     void Awake() {
         button = GetComponent<Button>();
         fractal = GameObject.FindGameObjectWithTag("Mandelbulb");
+
     }
 
 
@@ -72,7 +73,7 @@ public class ExportListener3DScene : MonoBehaviour, IPointerDownHandler {
         Texture2D texture = null;
         texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
         _textureBytes = texture.EncodeToPNG();
-        DownloadFile(gameObject.name, "OnFileDownload", "MandelbulbImage_"+countMandelbulb+".png", _textureBytes, _textureBytes.Length);
+        DownloadFile(gameObject.name, "OnFileDownload", "Fractal3D_"+countMandelbulb+".png", _textureBytes, _textureBytes.Length);
         countMandelbulb++;
         yield return new WaitForEndOfFrame();
     }

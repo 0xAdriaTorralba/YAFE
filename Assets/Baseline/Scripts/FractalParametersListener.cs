@@ -102,6 +102,21 @@ public class FractalParametersListener : MonoBehaviour
 
     private void SliderValueChanged(Slider slider){
         if (string.Equals(slider.tag, "SliderMaxIters")){
+            // if ((int) slider.value < 200){
+            //     fractalMandelbrot.fp.maxIters = 200;
+            //     fractalJulia.fp.maxIters = 200;
+            //     inputFieldMaxIters.text = 200+"";
+            // } 
+            // if ((int) slider.value > 200 && (int) slider.value < 500){
+            //     fractalMandelbrot.fp.maxIters = 500;
+            //     fractalJulia.fp.maxIters = 500;
+            //     inputFieldMaxIters.text = 500+"";
+            // }
+            // if ((int) slider.value > 500){
+            //     fractalMandelbrot.fp.maxIters = 800;
+            //     fractalJulia.fp.maxIters = 800;
+            //     inputFieldMaxIters.text = 800+"";
+            // } 
             fractalMandelbrot.fp.maxIters = (int) slider.value;
             fractalJulia.fp.maxIters = (int) slider.value;
             inputFieldMaxIters.text = slider.value + "";
@@ -124,6 +139,7 @@ public class FractalParametersListener : MonoBehaviour
     }
 
     void Update(){
+
 
         // Capture MaxIters input field.
         if (allowEnterMaxIters && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))){

@@ -8,8 +8,8 @@ public class MandelbrotGPU : FractalGPU
 {
 
     void Start(){
-        UpdateZoom(2.0f);
-        UpdatePosition(0.0f, 0.0f);
+        UpdateZoom(0.00012207031250f);
+        UpdatePosition(1.25360091145834000000f, -0.38446614583333f);
         UpdateColormap("Colormap 1 (Sin)");
         UpdateIterations(100);
         UpdateThreshold(2);

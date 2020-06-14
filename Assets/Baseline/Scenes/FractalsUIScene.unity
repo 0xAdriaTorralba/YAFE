@@ -5289,11 +5289,11 @@ MonoBehaviour:
     pwidth: 750
     pheight: 750
     xmin: 0
-    xmax: 2
+    xmax: 0.25
     ymin: 0
-    ymax: 2
-    panX: 0
-    panY: 0
+    ymax: 0.25
+    panX: -0.4986667
+    panY: 0.05466667
     viewPortX: 0
     viewPortY: 0
     viewPortWidth: 0
@@ -5302,17 +5302,17 @@ MonoBehaviour:
     finished: 0
     parallel: 1
   fp:
-    maxIters: 100
+    maxIters: 200
     threshold: 2
-    detail: 3000
+    detail: 20000
     degree: 2
     algorithm: Escape Algorithm
     colorMap: Colormap 1
     family: Polynomial
   GOprogressBar: {fileID: 1272040674}
   GOpercentage: {fileID: 14890459}
-  reZ: 0
-  imZ: 0
+  reZ: -0.765
+  imZ: 0.12
 --- !u!114 &209585141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7253,7 +7253,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -13992,7 +13992,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -25092,7 +25092,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -26581,7 +26581,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1102367205
 RectTransform:
   m_ObjectHideFlags: 0
@@ -30922,7 +30922,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1288903585
 RectTransform:
   m_ObjectHideFlags: 0
@@ -33158,7 +33158,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -36376,7 +36376,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -460, y: 95}
-  m_SizeDelta: {x: 800, y: 800}
+  m_SizeDelta: {x: 750, y: 750}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1489475525
 MonoBehaviour:
@@ -36455,11 +36455,11 @@ MonoBehaviour:
     pwidth: 800
     pheight: 800
     xmin: 0
-    xmax: 2
+    xmax: 0.00006103515625
     ymin: 0
-    ymax: 2
-    panX: 0
-    panY: 0
+    ymax: 0.00006103515625
+    panX: -1.74862239583333
+    panY: -0.012740234375
     viewPortX: 0
     viewPortY: 0
     viewPortWidth: 0
@@ -36468,7 +36468,7 @@ MonoBehaviour:
     finished: 0
     parallel: 1
   fp:
-    maxIters: 100
+    maxIters: 200
     threshold: 2
     detail: 1000
     degree: 2
@@ -40741,11 +40741,11 @@ MonoBehaviour:
     pwidth: 750
     pheight: 750
     xmin: 0
-    xmax: 2
+    xmax: 0.0078125
     ymin: 0
-    ymax: 2
-    panX: -0.5
-    panY: 0
+    ymax: 0.0078125
+    panX: -1.25545833333334
+    panY: 0.38145833333333
     viewPortX: 0
     viewPortY: 0
     viewPortWidth: 0
@@ -40754,9 +40754,9 @@ MonoBehaviour:
     finished: 0
     parallel: 1
   fp:
-    maxIters: 100
+    maxIters: 200
     threshold: 2
-    detail: 3000
+    detail: 20000
     degree: 2
     algorithm: Escape Algorithm
     colorMap: Colormap 1 (Sin)
@@ -44244,7 +44244,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -45816,7 +45816,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -49978,7 +49978,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 460, y: 95}
-  m_SizeDelta: {x: 800, y: 800}
+  m_SizeDelta: {x: 750, y: 750}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2000665473
 MonoBehaviour:
@@ -49999,7 +49999,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2000665471}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
@@ -50044,11 +50044,11 @@ MonoBehaviour:
     pwidth: 800
     pheight: 800
     xmin: 0
-    xmax: 2
+    xmax: 0.25
     ymin: 0
-    ymax: 2
-    panX: 0
-    panY: 0
+    ymax: 0.25
+    panX: 0.4986667
+    panY: -0.05466667
     viewPortX: 0
     viewPortY: 0
     viewPortWidth: 0
@@ -50057,7 +50057,7 @@ MonoBehaviour:
     finished: 0
     parallel: 1
   fp:
-    maxIters: 100
+    maxIters: 200
     threshold: 2
     detail: 1000
     degree: 2
