@@ -42,6 +42,8 @@ public class InterfaceController : MonoBehaviour
     private bool allowEnter, allowEnterJulia, calculateJuliaImages = false, reverse = false;
     private double defaultZoom, defaultMovement;
 
+    private Coroutine tooltipCorroutine;
+
     void Awake()
     {
         
@@ -759,6 +761,8 @@ public class InterfaceController : MonoBehaviour
             LogsController.UpdateLogs(new string[] {"You have reached the maximum value for " + source + "."}, "#FFA600");
         }
     }
+
+
 
 
 }
