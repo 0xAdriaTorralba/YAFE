@@ -34,6 +34,8 @@ TagManager:
   - Mandelbulb
   - SliderDetail
   - InputFieldDetail
+  - Github
+  - LinkedIn
   layers:
   - Default
   - TransparentFX

@@ -11,12 +11,30 @@ public class WelcomePageController : MonoBehaviour
     private Image image;
     private TextMeshProUGUI text;
 
+    private Button github, linkedin;
+
     void Awake(){
         dialogBox = GameObject.FindGameObjectWithTag("DialogBox");
         image = dialogBox.GetComponent<Image>();
         text = GameObject.Find("About Text").GetComponent<TextMeshProUGUI>();
+        github = GameObject.FindGameObjectWithTag("Github").GetComponent<Button>();
+        linkedin = GameObject.FindGameObjectWithTag("LinkedIn").GetComponent<Button>();
         dialogBox.SetActive(false);
     }
+
+    void Start(){
+        github.onClick.AddListener(() => GoToGithub());
+        linkedin.onClick.AddListener(() => GoToLinkedIn());
+    }
+
+    private void GoToGithub(){
+        Application.OpenURL("https://github.com/adry26");
+    }
+
+    private void GoToLinkedIn(){
+        Application.OpenURL("https://www.linkedin.com/in/adry26/");
+    }
+
 
     public void ToggleAboutDialog(){
         if (dialogBox.activeInHierarchy){
