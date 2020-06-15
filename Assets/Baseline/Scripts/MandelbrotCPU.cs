@@ -239,7 +239,6 @@ public class MandelbrotCPU : FractalCPU
 
         }
 
-        // condition i > 5 (for instance) in order to avoid find fixed points inside the filled Julia set.
         if (orbitFound){
             return Color.black;
         }else{

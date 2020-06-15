@@ -68,7 +68,7 @@ public class FractalGPU : Fractal
                     image.material = material;
                     break;
                 case "Henriksen Algorithm":
-                    material.shader = Shader.Find("FractalShaders/MandelbrotShader");
+                    material.shader = Shader.Find("FractalShaders/MandelbrotHenriksenShader");
                     image.material = material;
                     break;
                 default:
@@ -112,6 +112,11 @@ public class FractalGPU : Fractal
         image.material = material;
     }
 
+    protected void RedrawDetail(){
+        material.SetInt("_Detail", this.fp.detail);
+        image.material = material;
+    }
+
 
     protected void RedrawAll(){
         RedrawZoom();
@@ -139,6 +144,11 @@ public class FractalGPU : Fractal
     public void UpdateDegree(int degree){
         this.fp.degree = degree;
         RedrawDegree();
+    }
+
+    public void UpdateDetail(int detail){
+        this.fp.detail = detail;
+        RedrawDetail();
     }
 
     public void UpdateZoom(float zoom){

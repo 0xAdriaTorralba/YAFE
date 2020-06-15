@@ -88,13 +88,6 @@
                     )
                     + c;
                 }
-                if (_Degree == 6){
-                    v = float2(
-                        pow(v.x, 6) - 15 * pow(v.x, 4) * pow(v.y, 2) + 15 * pow(v.x, 2) * pow(v.y, 4) - pow(v.y, 6),
-                        6 * pow(v.x, 5) * v.y - 20 * pow(v.x, 3) * pow(v.y, 3) + 6 * v.x * pow(v.y, 5)
-                    )
-                    + c;
-                }
 
                 if (sqrt(dot(v, v)) < r){
                     m++;

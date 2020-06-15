@@ -166,6 +166,8 @@ public class InterfaceControllerGPU : MonoBehaviour
     }
 
     private void RefreshFractalJulia(double rez, double imz){
+        inputFields[3].text = "2.0";
+        inputFields[4].text = inputFields[5].text = "0.0";
         UpdateJuliaRenderingValues();
         fractalJulia.UpdateSeed((float)rez, (float) imz);
     }
@@ -184,6 +186,7 @@ public class InterfaceControllerGPU : MonoBehaviour
 
         if(Input.GetMouseButton(0) && clMandelbrot.getIsPointerIn()){
             fractalJulia.UpdateSeed((float)rezM, (float)imzM);
+            RestartFractalJulia();
             realPartJulia.text = rezM.ToString(format);
             imaginaryPartJulia.text = imzM.ToString(format);
         }
@@ -275,62 +278,6 @@ public class InterfaceControllerGPU : MonoBehaviour
         for (int i = 0; i < previousValuesJulia.Count - 1; i++){
             previousValuesJulia[i] = inputFieldsJulia[i].text;
         }
-    }
-
-    private IEnumerator OnSubmit(){
-        yield return new WaitForEndOfFrame();
-        double result;
-        bool error = false;
-        bool changed = false;
-        for (int i = 0; i < 3; i++){
-            if (!string.Equals(inputFields[i].text, previousValues[i])){
-                changed = true;
-            }
-            if (inputFields[i].text.Length == 0){
-                LogsController.UpdateLogs(new string[] {inputFields[i].name + " is empty!"}, "#FFA600");
-                yield return new WaitForSeconds(0.5f);
-                inputFields[i].text = previousValues[i];
-                error = true;
-            }
-            if (double.TryParse(inputFields[i].text, out result)){
-                inputFields[i].text = result.ToString(format);
-                continue;
-            }else{
-                LogsController.UpdateLogs(new string[] {"Error parsing Mandelbrot " + inputFields[i].name + ". Cannot parse '" + inputFields[i].text + "' to double."}, "#FFA600");
-                yield return new WaitForSeconds(0.5f);
-                inputFields[i].text = previousValues[i];
-                error = true;
-            }
-        }
-        if (!error && changed){
-            UpdateMandelbrotRenderingValues();
-        }
-
-        yield return new WaitForEndOfFrame();
-        error = false;
-        changed = false;
-        for (int i = 3; i < 6; i++){
-            if (!string.Equals(inputFields[i].text, previousValues[i])){
-                changed = true;
-            }
-            if (double.TryParse(inputFields[i].text, out result)){
-                inputFields[i].text = result.ToString(format);
-                continue;
-            }else{
-                LogsController.UpdateLogs(new string[] {"Error parsing Julia " + inputFields[i].name + ". Cannot parse '"+inputFields[i].text+ "' to double."}, "#FFA600");
-                yield return new WaitForSeconds(0.5f);
-                inputFields[i].text = previousValues[i];
-                error = true;
-            }
-        }
-        if (!error && changed){
-            UpdateJuliaRenderingValues();
-        }
-
-        for (int i = 0; i < 6; i++){
-            previousValues[i] = inputFields[i].text;
-        } 
-
     }
 
 

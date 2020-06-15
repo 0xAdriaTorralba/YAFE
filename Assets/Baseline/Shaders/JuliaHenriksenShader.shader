@@ -8,7 +8,7 @@
         _Zoom("Zoom", Vector) =  (1, 1, 1, 1)
         _Pan ("Pan", Vector) = (1, 1, 1, 1)
         _Iterations ("Iterations", Range(1, 2000)) = 100
-        _Threshold ("Threshold", Range(2, 2000)) = 2
+        _Detail ("Detail", Range(10, 1000)) = 100
         _Colormap ("Colormap", Int) = 1
         _Algorithm ("Algorithm", Int) = 1
         _Degree ("Degree", Int) = 2
@@ -37,7 +37,7 @@
         int _Iterations;
         float _Aspect;
         float4 _Seed;
-        float _Threshold;
+        float _Detail;
         int _Colormap;
         int _Algorithm;
         int _Degree;
@@ -57,16 +57,16 @@
 
             float2 c = _Seed;
             float2 v = (IN.uv_MainTex - 0.5) * _Zoom.xy * float2(1, _Aspect) - _Pan.xy;
-            float2 dv = float2(1.0, 0.0);
+            float2 dv = float2(1.0, 1.0);
             float2 w = (IN.uv_MainTex - 0.5) * _Zoom.xy * float2(1, _Aspect) - _Pan.xy;
-            const float r = _Threshold;
+            const float r = _Detail;
             int m = 0;
             float2 epsilon = float2(50.0, 50.0);
             float2 aux = float2(0.0, 0.0);
             bool orbitFound = false;
             float4 color;
-            float tol = _Zoom.x / 1e5;
-            //float tol = 1e-7;
+            //float tol = 1e-2;
+            float tol = _Zoom / _Detail;
             while 
                 (
                     m < _Iterations && 
@@ -78,20 +78,28 @@
                     );
                     v = float2(
                         v.x * v.x - v.y * v.y, 
-                        v.x * v.y * 2.0)
+                        v.x * v.y * 2)
                     + c;
-                    if (abs(v.x) > 1000 && abs(v.y) > 1000){
-                        //color = float4(sin(m/4), sin(m/5), sin(m/7), 1) / 4 + 0.75;
-                        color = float4(1,1,1,1);
+                    if (abs(v.x) > 500 && abs(v.y) > 500){
+                        if (_Colormap == 1){
+                            color = float4(sin(m/4), sin(m/5), sin(m/7), 1) / 4 + 0.75;
+                        }
+                        if (_Colormap == 2){
+                            color = float4(cos(m/4), cos(m/5), cos(m/7), 1) / 4 + 0.75;
+                        }     
+                        if (_Colormap == 3){
+                            color = float4(tan(m/4), tan(m/5), tan(m/7), 1) / 4 + 0.75;
+                        }  
+                        //color = float4(1,1,1,1);
                         o.Albedo = color;
                         o.Alpha = color.a;
                         return;
                     }
                     aux = float2(dv.x - 1.0, dv.y);
-                    if (abs(aux.x) > 1e-8){
+                    if (abs(aux.x) > 1e-6){
                         epsilon = float2(
-                            ((w.x - v.x) * aux.x + (w.y - v.y) * aux.y) / (float)(aux.x * aux.x - aux.y * aux.y),
-                            ((w.y - v.y) * aux.x - (w.x - v.x) * aux.y) / (float)(aux.x * aux.x - aux.y * aux.y)
+                            (float)((w.x - v.x) * aux.x + (w.y - v.y) * aux.y) / (float)(aux.x * aux.x - aux.y * aux.y),
+                            (float)((w.y - v.y) * aux.x - (w.x - v.x) * aux.y) / (float)(aux.x * aux.x - aux.y * aux.y)
                         );
                     }else{
                         continue;

@@ -10,20 +10,28 @@ public class FractalParametersListenerGPU : MonoBehaviour
     private MandelbrotGPU fractalMandelbrot;
     private JuliaGPU fractalJulia;
 
+    private GameObject detail, threshold, degree;
+
+    private int prevDeg = 2;
+
+
     private InterfaceControllerGPU interfaceController;
 
     private TMP_Dropdown dropdownAlgorithm, dropdownColormap, dropdownFamily;
-    private Slider sliderMaxIters, sliderThreshold, sliderDegree;
+    private Slider sliderMaxIters, sliderThreshold, sliderDegree, sliderDetail;
     
-    private int previousMaxIters = 100, previousThreshold = 2, previousDegree = 2;
+    private int previousMaxIters = 100, previousThreshold = 2, previousDegree = 2, previousDetail = 10;
 
-    private TMP_InputField inputFieldMaxIters, inputFieldThreshold, inputFieldDegree;
+    private TMP_InputField inputFieldMaxIters, inputFieldThreshold, inputFieldDegree, inputFieldDetail;
 
-    private bool allowEnterMaxIters = false, allowEnterThreshold = false, allowEnterDegree = false;
+    private bool allowEnterMaxIters = false, allowEnterThreshold = false, allowEnterDegree = false, allowEnterDetail = false;
     
     // Start is called before the first frame update
     void Start()
     {
+        threshold = GameObject.Find("Threshold");
+        detail = GameObject.Find("Detail");
+        degree = GameObject.Find("Degree");
         dropdownAlgorithm = GameObject.FindGameObjectWithTag("DropdownAlgorithm").GetComponent<TMP_Dropdown>();
         dropdownColormap = GameObject.FindGameObjectWithTag("DropdownColormap").GetComponent<TMP_Dropdown>();
         dropdownFamily = GameObject.FindGameObjectWithTag("DropdownFamily").GetComponent<TMP_Dropdown>();
@@ -31,10 +39,14 @@ public class FractalParametersListenerGPU : MonoBehaviour
         sliderMaxIters = GameObject.FindGameObjectWithTag("SliderMaxIters").GetComponent<Slider>();
         sliderThreshold = GameObject.FindGameObjectWithTag("SliderThreshold").GetComponent<Slider>();
         sliderDegree = GameObject.FindGameObjectWithTag("SliderDegree").GetComponent<Slider>();
+        sliderDetail = GameObject.FindGameObjectWithTag("SliderDetail").GetComponent<Slider>();
+
 
         inputFieldMaxIters = GameObject.FindGameObjectWithTag("InputFieldMaxIters").GetComponent<TMP_InputField>();
         inputFieldThreshold = GameObject.FindGameObjectWithTag("InputFieldThreshold").GetComponent<TMP_InputField>();
         inputFieldDegree = GameObject.FindGameObjectWithTag("InputFieldDegree").GetComponent<TMP_InputField>();
+        inputFieldDetail = GameObject.FindGameObjectWithTag("InputFieldDetail").GetComponent<TMP_InputField>();
+
 
         fractalMandelbrot = GameObject.FindGameObjectWithTag("Mandelbrot").GetComponent<MandelbrotGPU>();
         fractalJulia = GameObject.FindGameObjectWithTag("Julia").GetComponent<JuliaGPU>();
@@ -47,7 +59,10 @@ public class FractalParametersListenerGPU : MonoBehaviour
         sliderMaxIters.onValueChanged.AddListener( delegate { SliderValueChanged(sliderMaxIters); });
         sliderThreshold.onValueChanged.AddListener( delegate { SliderValueChanged(sliderThreshold); });
         sliderDegree.onValueChanged.AddListener( delegate { SliderValueChanged(sliderDegree); });
+        sliderDetail.onValueChanged.AddListener( delegate { SliderValueChanged(sliderDetail); });
+
         //inputFieldMaxIters.onValueChanged.AddListener( delegate  { InputFieldValueChanged(inputFieldMaxIters); });
+        ToggleParameters(true, false);
 
     }
 
@@ -60,20 +75,30 @@ public class FractalParametersListenerGPU : MonoBehaviour
         if (string.Equals(dropdown.tag, "DropdownAlgorithm")){
             fractalMandelbrot.UpdateAlgorithm(dropdown.captionText.text.ToString());
             fractalJulia.UpdateAlgorithm(dropdown.captionText.text.ToString());
-            // interfaceController.RefreshFractalMandelbrot();
-            // interfaceController.RefreshFractalJulia();
+            switch(dropdown.captionText.text.ToString()){
+                case "Escape Algorithm":
+                    fractalMandelbrot.UpdateDegree(prevDeg);
+                    fractalJulia.UpdateDegree(prevDeg);
+                    ToggleParameters(true, false);
+                    break;
+                case "Henriksen Algorithm":
+                    prevDeg = fractalMandelbrot.fp.degree;
+                    fractalMandelbrot.UpdateDegree(2);
+                    fractalJulia.UpdateDegree(2);
+                    ToggleParameters(false, true);
+                    break;
+                default:
+                    ToggleParameters(true, false);
+                    break;
+            }
         }
         if (string.Equals(dropdown.tag, "DropdownColormap")){
             fractalMandelbrot.UpdateColormap(dropdown.captionText.text.ToString());
             fractalJulia.UpdateColormap(dropdown.captionText.text.ToString());
-            // interfaceController.RefreshFractalMandelbrot();
-            // interfaceController.RefreshFractalJulia();
         }
         if (string.Equals(dropdown.tag, "DropdownFamily")){
             fractalMandelbrot.fp.family = dropdown.captionText.text.ToString();
             fractalJulia.fp.family = dropdown.captionText.text.ToString();
-            // interfaceController.RefreshFractalMandelbrot();
-            // interfaceController.RefreshFractalJulia();
         }
     }
 
@@ -92,6 +117,11 @@ public class FractalParametersListenerGPU : MonoBehaviour
             fractalMandelbrot.UpdateDegree((int) slider.value);
             fractalJulia.UpdateDegree((int) slider.value);
             inputFieldDegree.text = slider.value + "";
+        }
+        if (string.Equals(slider.tag, "SliderDetail")){
+            fractalMandelbrot.UpdateDetail((int) slider.value);
+            fractalJulia.UpdateDetail((int) slider.value);
+            inputFieldDetail.text = slider.value + "";
         }
     }
 
@@ -116,6 +146,13 @@ public class FractalParametersListenerGPU : MonoBehaviour
             allowEnterDegree = false;
         }else{
             allowEnterDegree = inputFieldDegree.isFocused;
+        }
+
+        if (allowEnterDetail && (Input.GetKey (KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))){
+            StartCoroutine(OnSubmit(inputFieldDetail, previousDetail, 10, 1000));
+            allowEnterDetail = false;
+        }else{
+            allowEnterDetail = inputFieldDetail.isFocused;
         }
 
 
@@ -166,6 +203,13 @@ public class FractalParametersListenerGPU : MonoBehaviour
             inputField.text = previousValue.ToString("D");
             error = true;
         }
+    }
+
+        private void ToggleParameters(bool thr, bool det){
+            threshold.SetActive(thr);
+            detail.SetActive(det);
+            degree.SetActive(thr);
+
     }
 
 }

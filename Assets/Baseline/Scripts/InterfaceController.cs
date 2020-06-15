@@ -608,6 +608,7 @@ public class InterfaceController : MonoBehaviour
         if (!error && changed){
             rezM = double.Parse(inputFieldsJulia[0].text);
             imzM = double.Parse(inputFieldsJulia[1].text);
+            fractalJulia.ResetRenderParameters();
             RefreshFractalJulia(rezM, imzM);
         }
 
