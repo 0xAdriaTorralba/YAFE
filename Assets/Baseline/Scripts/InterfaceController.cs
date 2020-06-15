@@ -432,14 +432,20 @@ public class InterfaceController : MonoBehaviour
         fractal.rp.ymax *= defaultZoom;
         if (fractal is MandelbrotCPU){
             inputFields[0].text = fractal.rp.xmax.ToString(format);
+            previousValues[0] = fractal.rp.xmax.ToString(format);
             inputFields[1].text = fractal.rp.panX.ToString(format);
+            previousValues[1] = fractal.rp.panX.ToString(format);
             inputFields[2].text = fractal.rp.panY.ToString(format);
+            previousValues[2] = fractal.rp.panY.ToString(format);
             ((MandelbrotCPU) fractal).StartDraw();
         }
         if (fractal is JuliaCPU){
             inputFields[3].text = fractal.rp.xmax.ToString(format);
+            previousValues[3] = fractal.rp.xmax.ToString(format);
             inputFields[4].text = fractal.rp.panX.ToString(format);
+            previousValues[4] = fractal.rp.panX.ToString(format);
             inputFields[5].text = fractal.rp.panY.ToString(format);
+            previousValues[5] = fractal.rp.panY.ToString(format);
             ((JuliaCPU) fractal).RedrawCurrent();
         }
     }
@@ -451,16 +457,31 @@ public class InterfaceController : MonoBehaviour
         fractal.rp.ymax /= defaultZoom;
         if (fractal is MandelbrotCPU){
             inputFields[0].text = fractal.rp.xmax.ToString(format);
+            previousValues[0] = fractal.rp.xmax.ToString(format);
             inputFields[1].text = fractal.rp.panX.ToString(format);
+            previousValues[1] = fractal.rp.panX.ToString(format);
             inputFields[2].text = fractal.rp.panY.ToString(format);
+            previousValues[2] = fractal.rp.panY.ToString(format);
             ((MandelbrotCPU) fractal).StartDraw();
         }
         if (fractal is JuliaCPU){
             inputFields[3].text = fractal.rp.xmax.ToString(format);
+            previousValues[3] = fractal.rp.xmax.ToString(format);
             inputFields[4].text = fractal.rp.panX.ToString(format);
+            previousValues[4] = fractal.rp.panX.ToString(format);
             inputFields[5].text = fractal.rp.panY.ToString(format);
+            previousValues[5] = fractal.rp.panY.ToString(format);
             ((JuliaCPU) fractal).RedrawCurrent();
         }
+    }
+
+    private void ResetInputFieldsMandelbrot(){
+        inputFields[0].text = "" + 2.0.ToString(format);
+        inputFields[1].text = "" + (-0.5).ToString(format);
+        inputFields[2].text = "" + 0.0.ToString(format);
+        previousValues[0] = "" + 2.0.ToString(format);
+        previousValues[1] = "" + (-0.5).ToString(format);
+        previousValues[2] = "" + 0.0.ToString(format);
     }
 
     private void ResetInputFieldsJulia(){
@@ -526,6 +547,18 @@ public class InterfaceController : MonoBehaviour
             reverse = true;
         }else{
             reverse = false;
+        }
+
+        if (clMandelbrot.getIsPointerIn() && Input.GetKeyDown(KeyCode.R) && fractalMandelbrot.GetFinished()){
+            fractalMandelbrot.ResetRenderParameters();
+            ResetInputFieldsMandelbrot();
+            fractalMandelbrot.StartDraw();
+        }
+
+        if (clJulia.getIsPointerIn() && Input.GetKeyDown(KeyCode.R) && fractalJulia.GetFinished()){
+            fractalJulia.ResetRenderParameters();
+            ResetInputFieldsJulia();
+            fractalJulia.RedrawCurrent();
         }
 
         // Input Fields management through Tab and LShifh + Tabs :)

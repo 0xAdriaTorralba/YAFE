@@ -436,5 +436,14 @@ public class MandelbrotCPU : FractalCPU
         }
     }
 
+
+    public new void ResetRenderParameters(){
+        rp.xmax = 2.0;
+        rp.ymax = 2.0;
+        rp.panX = -0.5;
+        rp.panY = 0.0;
+
+    }
+
    
 }

@@ -72,7 +72,7 @@ public class ExportListener3DScene : MonoBehaviour, IPointerDownHandler {
         Texture2D texture = null;
         texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
         _textureBytes = texture.EncodeToPNG();
-        DownloadFile(gameObject.name, "OnFileDownload", "MandelbulbImage_"+countMandelbulb+".png", _textureBytes, _textureBytes.Length);
+        DownloadFile(gameObject.name, "OnFileDownload", "Fractal3D_"+countMandelbulb+".png", _textureBytes, _textureBytes.Length);
         countMandelbulb++;
         yield return new WaitForEndOfFrame();
     }
@@ -120,7 +120,7 @@ public class ExportListener3DScene : MonoBehaviour, IPointerDownHandler {
     private IEnumerator ExportImage(GameObject fractal){
         Texture2D texture = null;
         texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
-        NativeGallery.SaveImageToGallery(texture.EncodeToPNG(), "Fractals Album", "MandelbulbImage_"+countMandelbulb+".png");
+        NativeGallery.SaveImageToGallery(texture.EncodeToPNG(), "Fractals Album", "Fractal3D_"+countMandelbulb+".png");
         countMandelbulb++;
         yield return new WaitForEndOfFrame();
     }
@@ -162,7 +162,7 @@ public class ExportListener3DScene : MonoBehaviour, IPointerDownHandler {
     private IEnumerator ExportImage(GameObject fractal){
         Texture2D texture = null;
         texture = TextureToTexture2D(fractal.GetComponent<RawImage>().texture);
-        SaveImage(texture.EncodeToPNG(), "MandelbulbImage_", ".png", ref countMandelbulb);
+        SaveImage(texture.EncodeToPNG(), "Fractal3D_", ".png", ref countMandelbulb);
         yield return new WaitForEndOfFrame();
     }
 

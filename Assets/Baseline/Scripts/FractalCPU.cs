@@ -30,8 +30,13 @@ public abstract class FractalCPU : Fractal
         return (float) rp.count / (rp.pwidth * rp.pheight);
     }
 
+    public void ResetRenderParameters(){
+        rp.xmax = 2.0;
+        rp.ymax = 2.0;
+        rp.panX = 0.0;
+        rp.panY = 0.0;
 
-
+    }
 
     protected IEnumerator Draw(){
         yield return null;

@@ -115,7 +115,9 @@ public class SimpleCameraController : MonoBehaviour
         if (automaticRotation){
             m_TargetCameraState.yaw -= Time.deltaTime;
             m_TargetCameraState.Translate(Vector3.right * Time.deltaTime/20.0f);
-        }        
+        }
+
+  
 
         // Exit Sample  
         if (Input.GetKey(KeyCode.Escape))

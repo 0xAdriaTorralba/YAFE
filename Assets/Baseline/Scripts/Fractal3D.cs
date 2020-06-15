@@ -65,6 +65,20 @@ public class Fractal3D : Fractal
         cameraController.SetAutomaticRotation(true);
         automaticRotationToggle.onValueChanged.AddListener((value) => ToggleParallel(value));
 
+        cameraController.enabled = false;
+        rendererCamera.transform.position = new Vector3(0f, 0f, -3f);
+        rendererCamera.transform.localRotation = new Quaternion();
+        cameraController.enabled = true;
+
+    }
+
+    void Update(){
+        if (Input.GetKeyDown(KeyCode.R)){
+            cameraController.enabled = false;
+            rendererCamera.transform.position = new Vector3(0f, 0f, -3f);
+            rendererCamera.transform.localRotation = new Quaternion();
+            cameraController.enabled = true;
+        }  
     }
 
     private void ToggleParallel(bool value){

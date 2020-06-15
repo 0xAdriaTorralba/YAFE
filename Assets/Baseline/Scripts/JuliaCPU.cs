@@ -131,13 +131,7 @@ public class JuliaCPU : FractalCPU
         }
     }
 
-    public void ResetRenderParameters(){
-        rp.xmax = 2.0;
-        rp.ymax = 2.0;
-        rp.panX = 0.0;
-        rp.panY = 0.0;
 
-    }
 
     public override void OnEnable(){
         //Draw(reZ, imZ);
