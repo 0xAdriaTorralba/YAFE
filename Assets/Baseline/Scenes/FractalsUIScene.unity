@@ -31243,7 +31243,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -772.87, y: -442.5}
+  m_AnchoredPosition: {x: -764.1, y: -435.3}
   m_SizeDelta: {x: 374.25122, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1251993981
@@ -31265,7 +31265,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'FPS: '
+  m_text: 'FPS:'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7cfec5dde0fa34635b4b4c0219b97f54, type: 2}
   m_sharedMaterial: {fileID: -7282182841092147596, guid: 7cfec5dde0fa34635b4b4c0219b97f54,
@@ -31335,9 +31335,9 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 1251993981}
-    characterCount: 5
+    characterCount: 4
     spriteCount: 0
-    spaceCount: 1
+    spaceCount: 0
     wordCount: 1
     linkCount: 0
     lineCount: 1
