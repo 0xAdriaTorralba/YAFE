@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FractalGPU : Fractal
+public abstract class FractalGPU : Fractal
 {
     protected RawImage image;
     protected Material material;

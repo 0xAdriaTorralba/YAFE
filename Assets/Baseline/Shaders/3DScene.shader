@@ -86,10 +86,10 @@ Shader "Fractals/3DScene"
 
 				return o;
 			}
-		float basic_box(float3 pos, float3 b){
-    float3 d = abs(pos) - b;
-    return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
-}
+			float basic_box(float3 pos, float3 b){
+				float3 d = abs(pos) - b;
+				return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+			}
 	
 
 

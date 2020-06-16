@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: MandelbrotSet
-  m_Shader: {fileID: 4800000, guid: b97ffea9e932c45babd8fc440c4d0bc7, type: 3}
+  m_Shader: {fileID: 4800000, guid: 4b1be3b8bdc4c4df3be1dd094369fc9f, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0

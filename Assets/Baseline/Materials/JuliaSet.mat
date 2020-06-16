@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: JuliaSet
-  m_Shader: {fileID: 4800000, guid: 2ff88cc7d817d434a8b6a0f24de35a1f, type: 3}
+  m_Shader: {fileID: 4800000, guid: 5f45ed4668a354b5fb69becdb40f72eb, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -99,5 +99,5 @@ Material:
     - _HueVariation: {r: 1, g: 0.5, b: 0, a: 0.1}
     - _Pan: {r: 0, g: 0, b: 0, a: 0}
     - _Position: {r: 0, g: 0, b: 0, a: 0}
-    - _Seed: {r: 0, g: 0, b: 0, a: 0}
+    - _Seed: {r: -0.23487262, g: 0.0099945795, b: 0, a: 0}
     - _Zoom: {r: 1.999996, g: 1.999996, b: 0, a: 0}
