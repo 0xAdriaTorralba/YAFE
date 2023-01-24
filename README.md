@@ -4,9 +4,9 @@ This is my Final Degree Project made at Universitat de Barcelona for the Double 
 
 This is an application that allows you to explore the fractals from Mandelbrot (and Multibrot) sets and Julia sets as well as some 3D fractals such as the Mandelbulb or some IFS fractals directly on a [website!](https://0xAdriaTorralba.github.io/YetAnotherFractalExplorer/)
 
-In addition, you can find on [releases](https://github.com/0xAdriaTorralba/YetAnotherFractalExplorer/releases/latest) the binaries for an enhanced MacOS version of this software! Windows and Linux binaries are comming soon.
+In addition, you can find on [releases](https://github.com/0xAdriaTorralba/YetAnotherFractalExplorer/releases/latest) the binaries for MacOS (both compiled for Intel and Apple Silicon), Windows and Linux.
 
-We also plan to release an iOS and Android application of this software.
+Might consider building and adapting this app to a mobile version (iOS and Android) if there are interest on something like that.
 
 Find the Final Degree Project memory [here](http://diposit.ub.edu/dspace/handle/2445/178855)
 
