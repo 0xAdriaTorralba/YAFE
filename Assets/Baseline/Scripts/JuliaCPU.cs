@@ -372,20 +372,6 @@ public class JuliaCPU : FractalCPU
                 break;
             }
         }
-        // To draw Siegel disks
-        // for (int k = 0; k < 10000; k++){
-        //     z = Complex.Pow(z, fp.degree) + new Complex(this.reZ, this.imZ);
-        //     cImageReZ = (int)((z.Real - rp.panX - rp.xmin) * (rp.pwidth / rp.viewPortWidth));
-        //     cImageImZ = (int)((z.Imaginary - rp.panY - rp.ymin) * (rp.pheight / rp.viewPortHeight));
-        //     //DrawLine(rp.tex2D, new UnityEngine.Vector2 (oldX, oldY), new UnityEngine.Vector2 (oldX, oldY), Color.yellow);
-        //     rp.tex2D.SetPixel((int)cImageReZ, (int)cImageImZ, Color.yellow);
-        //     oldX = cImageReZ;
-        //     oldY = cImageImZ;
-        //     if (Complex.Abs(z) > 2){
-        //         break;
-        //     }
-        // }
-
         rp.tex2D.Apply();
         rp.fractalImage.sprite = Sprite.Create(rp.tex2D, new Rect(0, 0, rp.tex2D.width, rp.tex2D.height), new UnityEngine.Vector2(0.5f, 0.5f)); 
     }

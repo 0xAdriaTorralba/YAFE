@@ -37,11 +37,12 @@ public class CameraMovementController : MonoBehaviour
     private void HandleInputs(){
 
         // Capture inputs
-        if (Input.GetAxis("Mouse ScrollWheel") < 0f || Input.GetKey(KeyCode.Minus) && Input.GetKey(KeyCode.RightShift)){ // backwards
-            scale *= 1.02f;
-        }else if (Input.GetAxis("Mouse ScrollWheel") > 0f  || Input.GetKey(KeyCode.Minus) ){ // forward
+        if (Input.GetAxis("Mouse ScrollWheel") > 0f  || Input.GetKey(KeyCode.Plus)){ // forward
             scale *= .98f;
-        } 
+
+        }else if (Input.GetAxis("Mouse ScrollWheel") < 0f || Input.GetKey(KeyCode.Minus)){ // backwards
+            scale *= 1.02f;
+        }
 
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {

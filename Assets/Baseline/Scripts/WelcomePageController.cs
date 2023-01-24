@@ -28,11 +28,11 @@ public class WelcomePageController : MonoBehaviour
     }
 
     private void GoToGithub(){
-        Application.OpenURL("https://github.com/adry26");
+        Application.OpenURL("https://github.com/0xAdriaTorralba");
     }
 
     private void GoToLinkedIn(){
-        Application.OpenURL("https://www.linkedin.com/in/adry26/");
+        Application.OpenURL("https://www.linkedin.com/in/adriatorralba/");
     }
 
 

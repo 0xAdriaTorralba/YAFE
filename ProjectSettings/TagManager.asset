@@ -3,39 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - Mandelbrot
-  - Julia
-  - EventSystem
-  - InterfaceController
-  - Logs
-  - AboutIcon
-  - DialogBox
-  - LogsController
-  - TextLogs
-  - MandelbrotImage
-  - DropdownAlgorithm
-  - DropdownColormap
-  - SliderMaxIters
-  - InputFieldMaxIters
-  - DropdownFamily
-  - SliderThreshold
-  - InputFieldThreshold
-  - InputFieldDegree
-  - SliderDegree
-  - ProgressBarMandelbrot
-  - ProgressBarJulia
-  - PercentageJulia
-  - PercentageMandelbrot
-  - ParallelToggle
-  - SmoothToggle
-  - MandelbrotQuad
-  - JuliaQuad
-  - Mandelbulb
-  - SliderDetail
-  - InputFieldDetail
-  - Github
-  - LinkedIn
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -45,7 +13,7 @@ TagManager:
   - UI
   - 
   - 
-  - Raycast
+  - 
   - 
   - 
   - 
