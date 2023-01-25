@@ -16,7 +16,7 @@ Find the Final Degree Project memory [here](http://diposit.ub.edu/dspace/handle/
 ![Imgur](https://i.imgur.com/ijVMPEv.png "Main Page")
 
 ### 2D Fractals rendered by CPU
-![Imgur](https://i.imgur.com/OW7UJKj.png "2D CPU Page")
+![Imgur](https://i.imgur.com/tLp4bv7.png "2D CPU Page")
 
 #### More options
 
@@ -53,4 +53,4 @@ Find the Final Degree Project memory [here](http://diposit.ub.edu/dspace/handle/
 
 The simplest way to setup the project is to download `YAFE.unitypackage`, create an empty 3D project on Unity and import the downloaded file there.
 
-Otherwise, if you clone this repository and recompile and reimport the assets on your local editor, it should work aswell.
+Additionally, it should work aswell if you clone this repository and recompile and reimport the assets on your local editor.
