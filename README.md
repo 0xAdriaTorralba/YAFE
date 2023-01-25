@@ -48,3 +48,9 @@ Find the Final Degree Project memory [here](http://diposit.ub.edu/dspace/handle/
 
 
 ![Imgur](https://i.imgur.com/BFbSLAR.png "Menger Sponge")
+
+## Development setup
+
+The simplest way to setup the project is to download `YAFE.unitypackage`, create an empty 3D project on Unity and import the downloaded file there.
+
+Otherwise, if you clone this repository and recompile and reimport the assets on your local editor, it should work aswell.
