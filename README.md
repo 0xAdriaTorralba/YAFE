@@ -10,6 +10,15 @@ Might consider building and adapting this app to a mobile version (iOS and Andro
 
 Find the Final Degree Project memory [here](http://diposit.ub.edu/dspace/handle/2445/178855)
 
+
+### Differences between WebGL (Website) version and Desktop version
+
+When I built this project (back in 2019), there was no support for threading on the CPU using WebGL, so the website version have the multithreading rendering on the CPU tab disabled, whereas the compiled desktop binaries have this feature enabled by default.
+
+Unity claimed that they would be adding support for multithreading on WebGL compilations. Further research is needed.
+
+
+
 ## Screenshots of the application
 
 ### Main page
